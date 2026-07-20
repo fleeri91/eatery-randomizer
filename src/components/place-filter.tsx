@@ -1,12 +1,6 @@
 import { Label } from './ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from './ui/select'
 import { Slider } from './ui/slider'
+import { cn } from '@/lib/utils'
 import {
   CATEGORY_TYPES,
   type Category,
@@ -30,31 +24,41 @@ export function PlaceFilters({ value, onChange }: PlaceFiltersProps) {
 
   return (
     <div className="space-y-6">
-      <div className="space-y-2">
-        <Label htmlFor="category">Category</Label>
-        <Select
-          value={value.category}
-          onValueChange={(category) => {
-            if (category) onChange({ ...value, category })
-          }}
-        >
-          <SelectTrigger id="category">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {categories.map((c) => (
-              <SelectItem key={c} value={c}>
+      <div className="space-y-2.5">
+        <Label className="text-xs font-semibold tracking-[0.12em] text-muted-foreground uppercase">
+          Category
+        </Label>
+        <div className="flex flex-wrap gap-2">
+          {categories.map((c) => {
+            const selected = value.category === c
+            return (
+              <button
+                key={c}
+                type="button"
+                onClick={() => onChange({ ...value, category: c })}
+                className={cn(
+                  'rounded-full border px-3.5 py-2 text-sm font-semibold transition-colors',
+                  selected
+                    ? 'border-primary bg-primary text-primary-foreground'
+                    : 'border-border bg-card text-foreground hover:bg-muted'
+                )}
+              >
                 {CATEGORY_LABELS[c]}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+              </button>
+            )
+          })}
+        </div>
       </div>
 
-      <div className="space-y-2">
-        <div className="flex justify-between">
-          <Label htmlFor="minRating">Minimum rating</Label>
-          <span className="text-sm text-muted-foreground">
+      <div className="space-y-2.5">
+        <div className="flex items-baseline justify-between">
+          <Label
+            htmlFor="minRating"
+            className="text-xs font-semibold tracking-[0.12em] text-muted-foreground uppercase"
+          >
+            Minimum rating
+          </Label>
+          <span className="font-heading text-base font-bold text-primary">
             {value.minRating === 0 ? 'Any' : `${value.minRating.toFixed(1)}+`}
           </span>
         </div>
@@ -71,10 +75,15 @@ export function PlaceFilters({ value, onChange }: PlaceFiltersProps) {
         />
       </div>
 
-      <div className="space-y-2">
-        <div className="flex justify-between">
-          <Label htmlFor="radius">Search radius</Label>
-          <span className="text-sm text-muted-foreground">
+      <div className="space-y-2.5">
+        <div className="flex items-baseline justify-between">
+          <Label
+            htmlFor="radius"
+            className="text-xs font-semibold tracking-[0.12em] text-muted-foreground uppercase"
+          >
+            Within
+          </Label>
+          <span className="font-heading text-base font-bold text-primary">
             {(value.radiusMeters / 1000).toFixed(1)} km
           </span>
         </div>
