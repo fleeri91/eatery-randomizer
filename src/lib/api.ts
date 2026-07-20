@@ -4,7 +4,7 @@ import {
   type SearchPlacesParams,
   type RawPlace,
   CATEGORY_TYPES,
-} from '../types/google-places.ts'
+} from '@/types/google-places.ts'
 
 const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string
 
