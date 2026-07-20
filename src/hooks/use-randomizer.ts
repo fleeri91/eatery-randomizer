@@ -1,16 +1,21 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { type Place } from '@/types/google-places'
-import { filterByRating, pickRandom } from '@/lib/randomizer'
+import { type Place, type PriceLevel } from '@/types/google-places'
+import { filterByPrice, filterByRating, pickRandom } from '@/lib/randomizer'
 
-export function useRandomizer(places: Place[] | undefined, minRating: number) {
+export function useRandomizer(
+  places: Place[] | undefined,
+  minRating: number,
+  priceLevels: ReadonlySet<PriceLevel>
+) {
   const [seenIds, setSeenIds] = useState<Set<string>>(new Set())
   const [blockedIds, setBlockedIds] = useState<Set<string>>(new Set())
   const [current, setCurrent] = useState<Place | null>(null)
 
   const eligible = useMemo(() => {
     const rated = filterByRating(places ?? [], minRating)
-    return rated.filter((p) => !blockedIds.has(p.id))
-  }, [places, minRating, blockedIds])
+    const priced = filterByPrice(rated, priceLevels)
+    return priced.filter((p) => !blockedIds.has(p.id))
+  }, [places, minRating, priceLevels, blockedIds])
 
   useEffect(() => {
     setSeenIds(new Set())
