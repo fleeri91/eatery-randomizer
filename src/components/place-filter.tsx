@@ -1,10 +1,14 @@
+import { Button } from './ui/button'
 import { Label } from './ui/label'
 import { Slider } from './ui/slider'
 import { cn } from '@/lib/utils'
 import {
   CATEGORY_TYPES,
+  PRICE_LEVEL_LABELS,
+  PRICE_LEVELS,
   type Category,
   type PlaceFilterValues,
+  type PriceLevel,
 } from '@/types/google-places'
 
 interface PlaceFiltersProps {
@@ -21,6 +25,12 @@ const CATEGORY_LABELS: Record<Category, string> = {
 
 export function PlaceFilters({ value, onChange }: PlaceFiltersProps) {
   const categories = Object.keys(CATEGORY_TYPES) as Category[]
+
+  function togglePriceLevel(level: PriceLevel) {
+    const next = new Set(value.priceLevels)
+    next.has(level) ? next.delete(level) : next.add(level)
+    onChange({ ...value, priceLevels: next })
+  }
 
   return (
     <div className="space-y-6">
@@ -73,6 +83,29 @@ export function PlaceFilters({ value, onChange }: PlaceFiltersProps) {
             onChange({ ...value, minRating })
           }}
         />
+      </div>
+
+      <div className="space-y-2">
+        <Label>Price</Label>
+        <div className="flex gap-2">
+          {PRICE_LEVELS.map((level) => (
+            <Button
+              key={level}
+              type="button"
+              size="sm"
+              variant={value.priceLevels.has(level) ? 'default' : 'outline'}
+              className="flex-1"
+              onClick={() => togglePriceLevel(level)}
+            >
+              {PRICE_LEVEL_LABELS[level]}
+            </Button>
+          ))}
+        </div>
+        <p className="text-xs text-muted-foreground">
+          {value.priceLevels.size === 0
+            ? 'Any price'
+            : 'Only selected price ranges'}
+        </p>
       </div>
 
       <div className="space-y-2.5">
