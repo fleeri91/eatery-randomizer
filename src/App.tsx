@@ -1,7 +1,11 @@
 import { useState } from 'react'
 import { StartScreen } from './views/start-screen'
-import { useCityLocation, useNearbyPlaces } from './lib/queries'
-import { type PlaceFilterValues } from './types/google-places'
+import { useNearbyPlaces } from './lib/queries'
+import {
+  EMPTY_PRICE_LEVELS,
+  type Coordinates,
+  type PlaceFilterValues,
+} from './types/google-places'
 import { useRandomizer } from './hooks/use-randomizer'
 import { RevealStage } from './components/reveal-stage'
 import { ResultCard } from './components/result-card'
@@ -9,48 +13,43 @@ import { Button } from './components/ui/button'
 
 export default function App() {
   const [submitted, setSubmitted] = useState<{
-    city: string
+    location: Coordinates
     filters: PlaceFilterValues
   } | null>(null)
-
-  const {
-    data: location,
-    isLoading: geocoding,
-    error: geoError,
-  } = useCityLocation(submitted?.city ?? '')
 
   const {
     data: places,
     isLoading: searching,
     error: placesError,
   } = useNearbyPlaces(
-    location,
+    submitted?.location,
     submitted?.filters.category ?? 'cafe',
     submitted?.filters.radiusMeters
   )
 
   const { current, randomize, block, poolSize, eligible } = useRandomizer(
     places,
-    submitted?.filters.minRating ?? 0
+    submitted?.filters.minRating ?? 0,
+    submitted?.filters.priceLevels ?? EMPTY_PRICE_LEVELS
   )
 
-  function handleSubmit(city: string, filters: PlaceFilterValues) {
-    setSubmitted({ city, filters })
+  function handleSubmit(location: Coordinates, filters: PlaceFilterValues) {
+    setSubmitted({ location, filters })
   }
 
   return (
     <div className="flex min-h-screen items-center justify-center p-6">
       {!submitted && <StartScreen onSubmit={handleSubmit} />}
 
-      {submitted && (geocoding || searching) && (
+      {submitted && searching && (
         <p className="animate-pulse font-heading text-lg font-semibold text-muted-foreground">
           Scouting the area…
         </p>
       )}
 
-      {submitted && (geoError || placesError) && (
+      {submitted && placesError && (
         <p className="text-sm font-medium text-destructive">
-          {(geoError ?? placesError)?.message}
+          {placesError.message}
         </p>
       )}
 
