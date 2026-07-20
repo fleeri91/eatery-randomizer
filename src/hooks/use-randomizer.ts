@@ -43,6 +43,7 @@ export function useRandomizer(places: Place[] | undefined, minRating: number) {
     current,
     randomize,
     poolSize: eligible.length,
+    eligible,
     exhausted: eligible.length > 0 && seenIds.size >= eligible.length,
   }
 }
