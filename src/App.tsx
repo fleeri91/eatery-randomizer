@@ -4,6 +4,7 @@ import { useCityLocation, useNearbyPlaces } from './lib/queries'
 import { type PlaceFilterValues } from './types/google-places'
 import { useRandomizer } from './hooks/use-randomizer'
 import { RevealStage } from './components/reveal-stage'
+import { ResultCard } from './components/result-card'
 
 export default function App() {
   const [submitted, setSubmitted] = useState<{
@@ -27,7 +28,7 @@ export default function App() {
     submitted?.filters.radiusMeters
   )
 
-  const { current, randomize, poolSize, eligible } = useRandomizer(
+  const { current, randomize, block, poolSize, eligible } = useRandomizer(
     places,
     submitted?.filters.minRating ?? 0
   )
@@ -54,10 +55,12 @@ export default function App() {
             candidateLabels={eligible.map((p) => p.name)}
           >
             {current && (
-              <div>
-                <strong>{current.name}</strong> — {current.address}
-                <br />⭐ {current.rating ?? 'no rating'}
-              </div>
+              <ResultCard
+                place={current}
+                category={submitted.filters.category}
+                onReroll={randomize}
+                onBlock={block}
+              />
             )}
           </RevealStage>
         </div>
