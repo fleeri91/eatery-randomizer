@@ -4,26 +4,12 @@ import {
   type SearchPlacesParams,
   type RawPlace,
   CATEGORY_TYPES,
+  type PlaceSuggestion,
+  type PriceLevel,
+  PRICE_LEVELS,
 } from '@/types/google-places.ts'
 
 const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string
-
-export async function geocodeCity(cityName: string): Promise<Coordinates> {
-  const url = new URL('https://maps.googleapis.com/maps/api/geocode/json')
-  url.searchParams.set('address', cityName)
-  url.searchParams.set('key', API_KEY)
-
-  const res = await fetch(url.toString())
-  if (!res.ok) throw new Error(`Geocoding request failed: ${res.status}`)
-
-  const data = await res.json()
-  if (data.status !== 'OK' || !data.results?.length) {
-    throw new Error(`No results for "${cityName}" (${data.status})`)
-  }
-
-  const { lat, lng } = data.results[0].geometry.location
-  return { lat, lng }
-}
 
 const FIELD_MASK = [
   'places.id',
@@ -34,6 +20,12 @@ const FIELD_MASK = [
   'places.userRatingCount',
   'places.priceLevel',
 ].join(',')
+
+function normalizePriceLevel(raw?: string): PriceLevel | null {
+  return (PRICE_LEVELS as readonly string[]).includes(raw ?? '')
+    ? (raw as PriceLevel)
+    : null
+}
 
 export async function searchPlaces({
   location,
@@ -77,6 +69,61 @@ export async function searchPlaces({
       : location,
     rating: p.rating ?? null,
     userRatingCount: p.userRatingCount ?? null,
-    priceLevel: p.priceLevel ?? null,
+    priceLevel: normalizePriceLevel(p.priceLevel),
   }))
+}
+
+export async function autocompleteCities(
+  input: string,
+  sessionToken: string
+): Promise<PlaceSuggestion[]> {
+  const res = await fetch(
+    'https://places.googleapis.com/v1/places:autocomplete',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Goog-Api-Key': API_KEY,
+      },
+      body: JSON.stringify({
+        input,
+        includedPrimaryTypes: ['(cities)'],
+        sessionToken,
+      }),
+    }
+  )
+
+  if (!res.ok) throw new Error(`Autocomplete failed: ${res.status}`)
+
+  const data = await res.json()
+  return (data.suggestions ?? [])
+    .filter((s: { placePrediction?: unknown }) => s.placePrediction)
+    .map((s: any) => ({
+      placeId: s.placePrediction.placeId,
+      mainText:
+        s.placePrediction.structuredFormat?.mainText?.text ??
+        s.placePrediction.text.text,
+      secondaryText:
+        s.placePrediction.structuredFormat?.secondaryText?.text ?? '',
+    }))
+}
+
+export async function getPlaceLocation(
+  placeId: string,
+  sessionToken: string
+): Promise<Coordinates> {
+  const url = new URL(`https://places.googleapis.com/v1/places/${placeId}`)
+  url.searchParams.set('sessionToken', sessionToken)
+
+  const res = await fetch(url.toString(), {
+    headers: {
+      'X-Goog-Api-Key': API_KEY,
+      'X-Goog-FieldMask': 'location',
+    },
+  })
+
+  if (!res.ok) throw new Error(`Place details failed: ${res.status}`)
+
+  const data = await res.json()
+  return { lat: data.location.latitude, lng: data.location.longitude }
 }
