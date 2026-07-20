@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { StartScreen } from './views/start-screen'
 import { useCityLocation, useNearbyPlaces } from './lib/queries'
 import { type PlaceFilterValues } from './types/google-places'
+import { useRandomizer } from './hooks/use-randomizer'
 
 export default function App() {
   const [submitted, setSubmitted] = useState<{
@@ -14,6 +15,7 @@ export default function App() {
     isLoading: geocoding,
     error: geoError,
   } = useCityLocation(submitted?.city ?? '')
+
   const {
     data: places,
     isLoading: searching,
@@ -22,6 +24,11 @@ export default function App() {
     location,
     submitted?.filters.category ?? 'cafe',
     submitted?.filters.radiusMeters
+  )
+
+  const { current, randomize, poolSize } = useRandomizer(
+    places,
+    submitted?.filters.minRating ?? 0
   )
 
   function handleSubmit(city: string, filters: PlaceFilterValues) {
@@ -35,7 +42,20 @@ export default function App() {
       {submitted && (geoError || placesError) && (
         <p style={{ color: 'red' }}>{(geoError ?? placesError)?.message}</p>
       )}
-      {submitted && places && <pre>{JSON.stringify(places, null, 2)}</pre>}
+      {submitted && places && (
+        <div>
+          <p>{poolSize} place(s) match your filters.</p>
+          <button onClick={randomize} disabled={poolSize === 0}>
+            🎲 Randomize
+          </button>
+          {current && (
+            <div>
+              <strong>{current.name}</strong> — {current.address}
+              <br />⭐ {current.rating ?? 'no rating'}
+            </div>
+          )}
+        </div>
+      )}
     </>
   )
 }
