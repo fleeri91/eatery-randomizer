@@ -80,9 +80,9 @@ export function PlaceFilters({ value, onChange }: PlaceFiltersProps) {
         </div>
         <Slider
           id="radius"
-          min={500}
-          max={10000}
-          step={500}
+          min={0}
+          max={3000}
+          step={100}
           value={[value.radiusMeters]}
           onValueChange={(val) => {
             const radiusMeters = Array.isArray(val) ? val[0] : val
