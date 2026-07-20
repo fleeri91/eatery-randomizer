@@ -37,3 +37,9 @@ export interface RawPlace {
   userRatingCount?: number
   priceLevel?: string
 }
+
+export interface PlaceFilterValues {
+  category: Category
+  minRating: number
+  radiusMeters: number
+}
