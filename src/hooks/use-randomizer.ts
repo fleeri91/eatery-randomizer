@@ -43,10 +43,13 @@ export function useRandomizer(
     setDrawCount((n) => n + 1)
   }, [eligible, seenIds, current])
 
-  // If the current pick falls out of `eligible` (just got blocked, or a
-  // filter change excluded it), immediately replace it.
+  // Draw automatically whenever there's no valid current pick — on first
+  // load, after the current pick falls out of `eligible` (just got blocked,
+  // or a filter change excluded it), or once results arrive for a fresh
+  // search.
   useEffect(() => {
-    if (current && !eligible.some((p) => p.id === current.id)) {
+    if (eligible.length === 0) return
+    if (!current || !eligible.some((p) => p.id === current.id)) {
       randomize()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
