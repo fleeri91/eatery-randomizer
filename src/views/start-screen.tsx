@@ -32,7 +32,11 @@ export function StartScreen({ onSubmit }: StartScreenProps) {
 
       <div className="space-y-6 px-6 py-5">
         <LocationAutocomplete onSelect={(loc) => setLocation(loc)} />
-        <PlaceFilters value={filters} onChange={setFilters} />
+        <PlaceFilters
+          value={filters}
+          onChange={setFilters}
+          disabled={!location}
+        />
       </div>
 
       <div className="border-t border-border bg-muted/40 px-6 py-5">

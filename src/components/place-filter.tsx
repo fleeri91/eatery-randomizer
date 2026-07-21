@@ -14,6 +14,7 @@ import {
 interface PlaceFiltersProps {
   value: PlaceFilterValues
   onChange: (value: PlaceFilterValues) => void
+  disabled?: boolean
 }
 
 const RATING_OPTIONS: { value: number; label: string }[] = [
@@ -23,7 +24,11 @@ const RATING_OPTIONS: { value: number; label: string }[] = [
   { value: 4.5, label: '4.5+' },
 ]
 
-export function PlaceFilters({ value, onChange }: PlaceFiltersProps) {
+export function PlaceFilters({
+  value,
+  onChange,
+  disabled = false,
+}: PlaceFiltersProps) {
   const categories = Object.keys(CATEGORY_TYPES) as Category[]
 
   function togglePriceLevel(level: PriceLevel) {
@@ -33,7 +38,32 @@ export function PlaceFilters({ value, onChange }: PlaceFiltersProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className={cn('space-y-6', disabled && 'opacity-50')}>
+      <div className="space-y-2.5">
+        <div className="flex items-baseline justify-between">
+          <Label
+            htmlFor="radius"
+            className="text-xs font-semibold tracking-[0.12em] text-muted-foreground uppercase"
+          >
+            Within
+          </Label>
+          <span className="font-heading text-base font-bold tabular-nums text-primary">
+            {(value.radiusMeters / 1000).toFixed(1)} km
+          </span>
+        </div>
+        <Slider
+          id="radius"
+          min={0}
+          max={3000}
+          step={100}
+          value={[value.radiusMeters]}
+          disabled={disabled}
+          onValueChange={(val) => {
+            const radiusMeters = Array.isArray(val) ? val[0] : val
+            onChange({ ...value, radiusMeters })
+          }}
+        />
+      </div>
       <div className="space-y-2.5">
         <Label className="text-xs font-semibold tracking-[0.12em] text-muted-foreground uppercase">
           Category
@@ -45,9 +75,10 @@ export function PlaceFilters({ value, onChange }: PlaceFiltersProps) {
               <button
                 key={c}
                 type="button"
+                disabled={disabled}
                 onClick={() => onChange({ ...value, category: c })}
                 className={cn(
-                  'rounded-full border px-3.5 py-2 text-sm font-semibold transition-colors',
+                  'rounded-full border px-3.5 py-2 text-sm font-semibold transition-colors disabled:pointer-events-none',
                   selected
                     ? 'border-primary bg-primary text-primary-foreground'
                     : 'border-border bg-card text-foreground hover:bg-muted'
@@ -71,9 +102,10 @@ export function PlaceFilters({ value, onChange }: PlaceFiltersProps) {
               <button
                 key={option.value}
                 type="button"
+                disabled={disabled}
                 onClick={() => onChange({ ...value, minRating: option.value })}
                 className={cn(
-                  'flex-1 rounded-2xl border py-3 font-heading text-base font-bold transition-colors',
+                  'flex-1 rounded-2xl border py-3 font-heading text-base font-bold transition-colors disabled:pointer-events-none',
                   selected
                     ? 'border-primary bg-primary text-primary-foreground'
                     : 'border-border bg-card text-foreground hover:bg-muted'
@@ -97,9 +129,10 @@ export function PlaceFilters({ value, onChange }: PlaceFiltersProps) {
               <button
                 key={level}
                 type="button"
+                disabled={disabled}
                 onClick={() => togglePriceLevel(level)}
                 className={cn(
-                  'flex-1 rounded-2xl border py-3 font-heading text-base font-bold transition-colors',
+                  'flex-1 rounded-2xl border py-3 font-heading text-base font-bold transition-colors disabled:pointer-events-none',
                   selected
                     ? 'border-primary bg-primary text-primary-foreground'
                     : 'border-border bg-card text-foreground hover:bg-muted'
@@ -115,31 +148,6 @@ export function PlaceFilters({ value, onChange }: PlaceFiltersProps) {
             ? 'Any price'
             : 'Only selected price ranges'}
         </p>
-      </div>
-
-      <div className="space-y-2.5">
-        <div className="flex items-baseline justify-between">
-          <Label
-            htmlFor="radius"
-            className="text-xs font-semibold tracking-[0.12em] text-muted-foreground uppercase"
-          >
-            Within
-          </Label>
-          <span className="font-heading text-base font-bold tabular-nums text-primary">
-            {(value.radiusMeters / 1000).toFixed(1)} km
-          </span>
-        </div>
-        <Slider
-          id="radius"
-          min={0}
-          max={3000}
-          step={100}
-          value={[value.radiusMeters]}
-          onValueChange={(val) => {
-            const radiusMeters = Array.isArray(val) ? val[0] : val
-            onChange({ ...value, radiusMeters })
-          }}
-        />
       </div>
     </div>
   )
