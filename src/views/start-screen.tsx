@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { LocationSheet } from '@/components/location-sheet'
 import { PlaceFilters } from '@/components/place-filter'
 import { cn } from '@/lib/utils'
-import { useFilterStore } from '@/store/filter-store'
+import { useFilterStore } from '@/stores/filter-store'
 import { type Coordinates } from '@/types/google-places'
 
 interface StartScreenProps {

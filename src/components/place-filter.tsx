@@ -1,7 +1,7 @@
 import { Label } from './ui/label'
 import { Slider } from './ui/slider'
 import { cn } from '@/lib/utils'
-import { useFilterStore } from '@/store/filter-store'
+import { useFilterStore } from '@/stores/filter-store'
 import {
   CATEGORY_LABELS,
   CATEGORY_TYPES,

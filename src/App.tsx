@@ -6,7 +6,7 @@ import { CATEGORY_LABELS } from './types/google-places'
 import { useRandomizer } from './hooks/use-randomizer'
 import { RevealStage } from './components/reveal-stage'
 import { ResultCard } from './components/result-card'
-import { useFilterStore } from './store/filter-store'
+import { useFilterStore } from './stores/filter-store'
 
 export default function App() {
   const [submitted, setSubmitted] = useState(false)

@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input'
 import { autocompleteCities, getPlaceLocation } from '@/lib/api'
 import { getCurrentPosition } from '@/lib/geo-location'
 import { cn } from '@/lib/utils'
-import { useFilterStore } from '@/store/filter-store'
+import { useFilterStore } from '@/stores/filter-store'
 import { type Coordinates, type PlaceSuggestion } from '@/types/google-places'
 
 interface LocationSheetProps {
