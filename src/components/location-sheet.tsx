@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
-import { LoaderCircle, LocateFixed, Search } from 'lucide-react'
+import { Check, LoaderCircle, LocateFixed, Search } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { autocompleteCities, getPlaceLocation } from '@/lib/api'
 import { getCurrentPosition } from '@/lib/geo-location'
+import { cn } from '@/lib/utils'
+import { useFilterStore } from '@/store/filter-store'
 import { type Coordinates, type PlaceSuggestion } from '@/types/google-places'
 
 interface LocationSheetProps {
@@ -16,6 +18,9 @@ export function LocationSheet({
   onOpenChange,
   onSelect,
 }: LocationSheetProps) {
+  const currentLabel = useFilterStore((s) => s.locationLabel)
+  const usingHere = currentLabel === 'Near me'
+
   const [query, setQuery] = useState('')
   const [suggestions, setSuggestions] = useState<PlaceSuggestion[]>([])
   const [searching, setSearching] = useState(false)
@@ -23,16 +28,22 @@ export function LocationSheet({
   const [error, setError] = useState<string | null>(null)
   const sessionToken = useRef(crypto.randomUUID())
 
-  // Reset to a blank slate each time the sheet is (re)opened.
+  // Re-seed with whatever's currently selected each time the sheet opens, so
+  // reopening shows the active pick instead of always starting blank.
   useEffect(() => {
     if (!open) return
-    setQuery('')
-    setSuggestions([])
+    setQuery(usingHere ? '' : currentLabel)
     setError(null)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
+  // Depends on `open` too (not just `query`) — reopening with the exact same
+  // query text as before wouldn't otherwise re-trigger this, since React
+  // bails out when a state update doesn't change the value, leaving the
+  // suggestions from the previous seed effect cleared with nothing to
+  // repopulate them.
   useEffect(() => {
-    if (!query.trim()) {
+    if (!open || !query.trim()) {
       setSuggestions([])
       setSearching(false)
       return
@@ -50,7 +61,7 @@ export function LocationSheet({
     }, 300) // debounce keystrokes
 
     return () => window.clearTimeout(timeoutId)
-  }, [query])
+  }, [query, open])
 
   async function handleSelect(suggestion: PlaceSuggestion) {
     setError(null)
@@ -100,7 +111,12 @@ export function LocationSheet({
           type="button"
           onClick={handleUseCurrentLocation}
           disabled={locating}
-          className="mb-3 flex w-full shrink-0 items-center gap-3 rounded-2xl border border-border bg-background px-4 py-3.5 text-left transition-colors hover:bg-muted disabled:opacity-60"
+          className={cn(
+            'mb-3 flex w-full shrink-0 items-center gap-3 rounded-2xl border px-4 py-3.5 text-left transition-colors disabled:opacity-60',
+            usingHere
+              ? 'border-primary bg-secondary'
+              : 'border-border bg-background hover:bg-muted'
+          )}
         >
           <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
             {locating ? (
@@ -109,12 +125,24 @@ export function LocationSheet({
               <LocateFixed className="size-4" />
             )}
           </span>
-          <span>
-            <span className="block text-base font-bold text-foreground">
-              {locating ? 'Locating…' : 'Use my location'}
+          <span className="min-w-0 flex-1">
+            <span className="flex items-center gap-1.5">
+              <span
+                className={cn(
+                  'block text-base font-bold',
+                  usingHere ? 'text-primary' : 'text-foreground'
+                )}
+              >
+                {locating ? 'Locating…' : 'Use my location'}
+              </span>
+              {usingHere && !locating && (
+                <Check className="size-4 shrink-0 text-primary" />
+              )}
             </span>
             <span className="mt-0.5 block text-xs text-muted-foreground">
-              Pick from what's around me right now
+              {usingHere
+                ? 'Currently selected'
+                : "Pick from what's around me right now"}
             </span>
           </span>
         </button>
@@ -146,26 +174,42 @@ export function LocationSheet({
         )}
 
         <div className="mt-3 -mx-1.5 flex-1 overflow-y-auto px-1.5">
-          {suggestions.map((s) => (
-            <button
-              key={s.placeId}
-              type="button"
-              onClick={() => handleSelect(s)}
-              className="flex w-full items-center gap-3 border-b border-border/70 px-1 py-3 text-left last:border-0 hover:bg-muted"
-            >
-              <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-secondary">
-                <span className="size-2.5 shrink-0 rotate-[-45deg] rounded-[50%_50%_50%_0] bg-primary" />
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block truncate text-[15px] font-bold text-foreground">
-                  {s.mainText}
+          {suggestions.map((s) => {
+            // Only mark a row as the active pick when it's an unambiguous
+            // match — "Stockholm" alone can't tell Sweden from Wisconsin
+            // apart, and we don't persist enough to disambiguate, so a
+            // same-name collision means none of them get the checkmark
+            // rather than misleadingly marking all of them.
+            const selected =
+              !usingHere &&
+              s.mainText === currentLabel &&
+              suggestions.filter((r) => r.mainText === currentLabel).length ===
+                1
+            return (
+              <button
+                key={s.placeId}
+                type="button"
+                onClick={() => handleSelect(s)}
+                className={cn(
+                  'flex w-full items-center gap-3 border-b border-border/70 px-1 py-3 text-left last:border-0 hover:bg-muted',
+                  selected && 'bg-secondary/60'
+                )}
+              >
+                <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-secondary">
+                  <span className="size-2.5 shrink-0 rotate-[-45deg] rounded-[50%_50%_50%_0] bg-primary" />
                 </span>
-                <span className="block truncate text-xs text-muted-foreground">
-                  {s.secondaryText}
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-[15px] font-bold text-foreground">
+                    {s.mainText}
+                  </span>
+                  <span className="block truncate text-xs text-muted-foreground">
+                    {s.secondaryText}
+                  </span>
                 </span>
-              </span>
-            </button>
-          ))}
+                {selected && <Check className="size-4 shrink-0 text-primary" />}
+              </button>
+            )
+          })}
           {!searching && query.trim() && suggestions.length === 0 && (
             <p className="py-6 text-center text-sm text-muted-foreground">
               No places match "{query}"
