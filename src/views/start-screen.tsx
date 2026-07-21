@@ -4,23 +4,17 @@ import { Button } from '@/components/ui/button'
 import { LocationSheet } from '@/components/location-sheet'
 import { PlaceFilters } from '@/components/place-filter'
 import { cn } from '@/lib/utils'
-import { type Coordinates, type PlaceFilterValues } from '@/types/google-places'
+import { useFilterStore } from '@/store/filter-store'
+import { type Coordinates } from '@/types/google-places'
 
 interface StartScreenProps {
-  onSubmit: (location: Coordinates, filters: PlaceFilterValues) => void
-}
-
-const DEFAULT_FILTERS: PlaceFilterValues = {
-  category: 'cafe',
-  minRating: 0,
-  radiusMeters: 3000,
-  priceLevels: new Set(),
+  onSubmit: () => void
 }
 
 export function StartScreen({ onSubmit }: StartScreenProps) {
-  const [location, setLocation] = useState<Coordinates | null>(null)
-  const [locationLabel, setLocationLabel] = useState('')
-  const [filters, setFilters] = useState<PlaceFilterValues>(DEFAULT_FILTERS)
+  const location = useFilterStore((s) => s.location)
+  const locationLabel = useFilterStore((s) => s.locationLabel)
+  const setLocation = useFilterStore((s) => s.setLocation)
   const [locOpen, setLocOpen] = useState(false)
   const [unlocking, setUnlocking] = useState(false)
   const unlockTimeout = useRef<number | undefined>(undefined)
@@ -29,8 +23,7 @@ export function StartScreen({ onSubmit }: StartScreenProps) {
 
   function handleLocationSelect(loc: Coordinates, label: string) {
     const wasUnset = !location
-    setLocation(loc)
-    setLocationLabel(label)
+    setLocation(loc, label)
     setLocOpen(false)
     if (wasUnset) {
       setUnlocking(true)
@@ -84,18 +77,14 @@ export function StartScreen({ onSubmit }: StartScreenProps) {
             }
           >
             <div className="px-6 py-5">
-              <PlaceFilters
-                value={filters}
-                onChange={setFilters}
-                disabled={locked}
-              />
+              <PlaceFilters disabled={locked} />
             </div>
 
             <div className="border-t border-border bg-muted/40 px-6 py-5">
               <Button
                 className="w-full rounded-2xl py-6 font-heading text-lg font-bold shadow-[0_10px_24px_-6px_oklch(0.66_0.19_32/0.5)]"
                 disabled={locked}
-                onClick={() => location && onSubmit(location, filters)}
+                onClick={onSubmit}
               >
                 Shuffle the block
               </Button>

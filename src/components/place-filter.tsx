@@ -1,19 +1,16 @@
 import { Label } from './ui/label'
 import { Slider } from './ui/slider'
 import { cn } from '@/lib/utils'
+import { useFilterStore } from '@/store/filter-store'
 import {
   CATEGORY_LABELS,
   CATEGORY_TYPES,
   PRICE_LEVEL_LABELS,
   PRICE_LEVELS,
   type Category,
-  type PlaceFilterValues,
-  type PriceLevel,
 } from '@/types/google-places'
 
 interface PlaceFiltersProps {
-  value: PlaceFilterValues
-  onChange: (value: PlaceFilterValues) => void
   disabled?: boolean
 }
 
@@ -24,18 +21,13 @@ const RATING_OPTIONS: { value: number; label: string }[] = [
   { value: 4.5, label: '4.5+' },
 ]
 
-export function PlaceFilters({
-  value,
-  onChange,
-  disabled = false,
-}: PlaceFiltersProps) {
+export function PlaceFilters({ disabled = false }: PlaceFiltersProps) {
   const categories = Object.keys(CATEGORY_TYPES) as Category[]
-
-  function togglePriceLevel(level: PriceLevel) {
-    const next = new Set(value.priceLevels)
-    next.has(level) ? next.delete(level) : next.add(level)
-    onChange({ ...value, priceLevels: next })
-  }
+  const value = useFilterStore((s) => s.filters)
+  const setCategory = useFilterStore((s) => s.setCategory)
+  const setMinRating = useFilterStore((s) => s.setMinRating)
+  const setRadiusMeters = useFilterStore((s) => s.setRadiusMeters)
+  const togglePriceLevel = useFilterStore((s) => s.togglePriceLevel)
 
   return (
     <div className={cn('space-y-6', disabled && 'opacity-50')}>
@@ -51,7 +43,7 @@ export function PlaceFilters({
                 key={c}
                 type="button"
                 disabled={disabled}
-                onClick={() => onChange({ ...value, category: c })}
+                onClick={() => setCategory(c)}
                 className={cn(
                   'rounded-full border px-3.5 py-2 text-sm font-semibold transition-colors disabled:pointer-events-none',
                   selected
@@ -110,7 +102,7 @@ export function PlaceFilters({
                 key={option.value}
                 type="button"
                 disabled={disabled}
-                onClick={() => onChange({ ...value, minRating: option.value })}
+                onClick={() => setMinRating(option.value)}
                 className={cn(
                   'flex-1 rounded-2xl border py-3 font-heading text-base font-bold transition-colors disabled:pointer-events-none',
                   selected
@@ -146,7 +138,7 @@ export function PlaceFilters({
           disabled={disabled}
           onValueChange={(val) => {
             const radiusMeters = Array.isArray(val) ? val[0] : val
-            onChange({ ...value, radiusMeters })
+            setRadiusMeters(radiusMeters)
           }}
         />
       </div>
