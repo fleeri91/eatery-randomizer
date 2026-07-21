@@ -56,35 +56,25 @@ export default function App() {
 
       {submitted && places && (
         <div className="w-full max-w-sm space-y-4">
-          <div className="flex items-center justify-between gap-3 px-1">
-            <div className="flex min-w-0 items-center gap-3">
-              <button
-                type="button"
-                aria-label="Back to filters"
-                onClick={() => setSubmitted(null)}
-                className="flex size-9 shrink-0 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-muted"
-              >
-                <ChevronLeft className="size-5" />
-              </button>
-              <div className="min-w-0">
-                <p className="font-heading text-base leading-tight font-extrabold text-foreground">
-                  Whim
-                </p>
-                <p className="truncate text-xs text-muted-foreground">
-                  {CATEGORY_LABELS[submitted.filters.category]} · within{' '}
-                  {(submitted.filters.radiusMeters / 1000).toFixed(1)} km ·{' '}
-                  {poolSize} place{poolSize === 1 ? '' : 's'}
-                </p>
-              </div>
-            </div>
+          <div className="flex items-center gap-3 px-1">
             <button
               type="button"
-              onClick={randomize}
-              disabled={poolSize === 0}
-              className="shrink-0 rounded-full border border-border px-3 py-1.5 text-[11px] font-semibold tracking-[0.14em] text-muted-foreground uppercase transition-colors hover:bg-muted disabled:pointer-events-none disabled:opacity-50"
+              aria-label="Back to filters"
+              onClick={() => setSubmitted(null)}
+              className="flex size-9 shrink-0 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-muted"
             >
-              Shuffle
+              <ChevronLeft className="size-5" />
             </button>
+            <div className="min-w-0">
+              <p className="font-heading text-base leading-tight font-extrabold text-foreground">
+                Whim
+              </p>
+              <p className="truncate text-xs text-muted-foreground">
+                {CATEGORY_LABELS[submitted.filters.category]} · within{' '}
+                {(submitted.filters.radiusMeters / 1000).toFixed(1)} km ·{' '}
+                {poolSize} place{poolSize === 1 ? '' : 's'}
+              </p>
+            </div>
           </div>
           <RevealStage
             revealKey={current?.id ?? null}
