@@ -1,20 +1,17 @@
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { type Place, type Category } from '@/types/google-places'
+import {
+  CATEGORY_LABELS,
+  type Place,
+  type Category,
+} from '@/types/google-places'
 
 interface ResultCardProps {
   place: Place
   category: Category
   onReroll: () => void
   onBlock: (id: string) => void
-}
-
-const CATEGORY_LABELS: Record<Category, string> = {
-  cafe: 'Café',
-  restaurant: 'Restaurant',
-  bar: 'Bar',
-  bakery: 'Bakery',
 }
 
 const PRICE_SYMBOLS: Record<string, string> = {
@@ -55,13 +52,12 @@ export function ResultCard({
               {place.name}
             </h2>
             <p className="mt-1.5 text-sm text-muted-foreground">
-              {CATEGORY_LABELS[category]}
-              {price && ` · ${price}`} · {place.address}
+              {place.address}
             </p>
           </div>
           {place.rating !== null ? (
             <div className="flex-shrink-0 text-center">
-              <div className="font-heading text-2xl font-extrabold text-primary">
+              <div className="font-heading text-2xl font-extrabold tabular-nums text-primary">
                 {place.rating.toFixed(1)}
               </div>
               <div className="text-[10px] font-semibold tracking-[0.14em] text-muted-foreground/80">
@@ -69,6 +65,17 @@ export function ResultCard({
               </div>
             </div>
           ) : null}
+        </div>
+
+        <div className="mt-3 flex flex-wrap gap-2">
+          <span className="rounded-full border border-border bg-muted px-3 py-1.5 text-xs font-medium text-foreground/80">
+            {CATEGORY_LABELS[category]}
+          </span>
+          {price && (
+            <span className="rounded-full border border-border bg-muted px-3 py-1.5 text-xs font-medium text-foreground/80">
+              {price}
+            </span>
+          )}
         </div>
 
         {place.rating === null && (
@@ -90,7 +97,7 @@ export function ResultCard({
           <iframe
             title={`Map showing ${place.name}`}
             width="100%"
-            height="120"
+            height="180"
             style={{ border: 0, display: 'block' }}
             loading="lazy"
             src={mapEmbedSrc(place.id)}
@@ -107,7 +114,10 @@ export function ResultCard({
         </a>
 
         <div className="mt-2.5 flex gap-2.5 pb-6">
-          <Button className="flex-1 rounded-2xl py-5 text-sm font-bold" onClick={onReroll}>
+          <Button
+            className="flex-1 rounded-2xl py-5 text-sm font-bold"
+            onClick={onReroll}
+          >
             ↻ Roll again
           </Button>
           <Button

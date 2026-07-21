@@ -14,8 +14,8 @@ interface RevealStageProps {
 
 type Phase = 'idle' | 'cycling' | 'settled'
 
-const ROW_HEIGHT = 56
-const WINDOW_HEIGHT = 196
+const ROW_HEIGHT = 64
+const WINDOW_HEIGHT = 224
 const REPEATS = 6
 
 function easeOutQuart(p: number) {
@@ -44,6 +44,14 @@ export function RevealStage({
     prevKey.current = revealKey
 
     if (candidateLabels.length <= 1) {
+      setPhase('settled')
+      return
+    }
+
+    const reduceMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)'
+    ).matches
+    if (reduceMotion) {
       setPhase('settled')
       return
     }
@@ -90,7 +98,7 @@ export function RevealStage({
     const finalOffset =
       landingRow * ROW_HEIGHT - (WINDOW_HEIGHT / 2 - ROW_HEIGHT / 2)
     const translate = finalOffset * progress
-    const blur = Math.min(6, (1 - progress) * 18)
+    const blur = Math.min(9, (1 - progress) * 26)
 
     return (
       <div
@@ -127,7 +135,12 @@ export function RevealStage({
   if (phase === 'settled') {
     // key={revealKey} forces a remount each reveal, replaying the transition.
     return (
-      <div key={revealKey} style={{ animation: 'reveal-settle 300ms ease-out' }}>
+      <div
+        key={revealKey}
+        style={{
+          animation: 'sheet-up 500ms cubic-bezier(0.2, 0.8, 0.2, 1)',
+        }}
+      >
         {children}
       </div>
     )

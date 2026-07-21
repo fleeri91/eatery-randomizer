@@ -10,6 +10,7 @@ export function useRandomizer(
   const [seenIds, setSeenIds] = useState<Set<string>>(new Set())
   const [blockedIds, setBlockedIds] = useState<Set<string>>(new Set())
   const [current, setCurrent] = useState<Place | null>(null)
+  const [drawCount, setDrawCount] = useState(0)
 
   const eligible = useMemo(() => {
     const rated = filterByRating(places ?? [], minRating)
@@ -21,6 +22,7 @@ export function useRandomizer(
     setSeenIds(new Set())
     setBlockedIds(new Set())
     setCurrent(null)
+    setDrawCount(0)
   }, [places])
 
   const randomize = useCallback(() => {
@@ -38,6 +40,7 @@ export function useRandomizer(
     const picked = pickRandom(pool)!
     setCurrent(picked)
     setSeenIds(new Set(nextSeen).add(picked.id))
+    setDrawCount((n) => n + 1)
   }, [eligible, seenIds, current])
 
   // If the current pick falls out of `eligible` (just got blocked, or a
@@ -60,5 +63,6 @@ export function useRandomizer(
     poolSize: eligible.length,
     eligible,
     exhausted: eligible.length > 0 && seenIds.size >= eligible.length,
+    drawCount,
   }
 }

@@ -1,8 +1,8 @@
-import { Button } from './ui/button'
 import { Label } from './ui/label'
 import { Slider } from './ui/slider'
 import { cn } from '@/lib/utils'
 import {
+  CATEGORY_LABELS,
   CATEGORY_TYPES,
   PRICE_LEVEL_LABELS,
   PRICE_LEVELS,
@@ -16,12 +16,12 @@ interface PlaceFiltersProps {
   onChange: (value: PlaceFilterValues) => void
 }
 
-const CATEGORY_LABELS: Record<Category, string> = {
-  cafe: '☕ Café',
-  restaurant: '🍽️ Restaurant',
-  bar: '🍺 Bar',
-  bakery: '🥐 Bakery',
-}
+const RATING_OPTIONS: { value: number; label: string }[] = [
+  { value: 0, label: 'Any' },
+  { value: 3.5, label: '3.5+' },
+  { value: 4, label: '4.0+' },
+  { value: 4.5, label: '4.5+' },
+]
 
 export function PlaceFilters({ value, onChange }: PlaceFiltersProps) {
   const categories = Object.keys(CATEGORY_TYPES) as Category[]
@@ -61,45 +61,54 @@ export function PlaceFilters({ value, onChange }: PlaceFiltersProps) {
       </div>
 
       <div className="space-y-2.5">
-        <div className="flex items-baseline justify-between">
-          <Label
-            htmlFor="minRating"
-            className="text-xs font-semibold tracking-[0.12em] text-muted-foreground uppercase"
-          >
-            Minimum rating
-          </Label>
-          <span className="font-heading text-base font-bold text-primary">
-            {value.minRating === 0 ? 'Any' : `${value.minRating.toFixed(1)}+`}
-          </span>
+        <Label className="text-xs font-semibold tracking-[0.12em] text-muted-foreground uppercase">
+          Minimum rating
+        </Label>
+        <div className="flex gap-2">
+          {RATING_OPTIONS.map((option) => {
+            const selected = value.minRating === option.value
+            return (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => onChange({ ...value, minRating: option.value })}
+                className={cn(
+                  'flex-1 rounded-2xl border py-3 font-heading text-base font-bold transition-colors',
+                  selected
+                    ? 'border-primary bg-primary text-primary-foreground'
+                    : 'border-border bg-card text-foreground hover:bg-muted'
+                )}
+              >
+                {option.label}
+              </button>
+            )
+          })}
         </div>
-        <Slider
-          id="minRating"
-          min={0}
-          max={5}
-          step={0.5}
-          value={[value.minRating]}
-          onValueChange={(val) => {
-            const minRating = Array.isArray(val) ? val[0] : val
-            onChange({ ...value, minRating })
-          }}
-        />
       </div>
 
-      <div className="space-y-2">
-        <Label>Price</Label>
+      <div className="space-y-2.5">
+        <Label className="text-xs font-semibold tracking-[0.12em] text-muted-foreground uppercase">
+          Price
+        </Label>
         <div className="flex gap-2">
-          {PRICE_LEVELS.map((level) => (
-            <Button
-              key={level}
-              type="button"
-              size="sm"
-              variant={value.priceLevels.has(level) ? 'default' : 'outline'}
-              className="flex-1"
-              onClick={() => togglePriceLevel(level)}
-            >
-              {PRICE_LEVEL_LABELS[level]}
-            </Button>
-          ))}
+          {PRICE_LEVELS.map((level) => {
+            const selected = value.priceLevels.has(level)
+            return (
+              <button
+                key={level}
+                type="button"
+                onClick={() => togglePriceLevel(level)}
+                className={cn(
+                  'flex-1 rounded-2xl border py-3 font-heading text-base font-bold transition-colors',
+                  selected
+                    ? 'border-primary bg-primary text-primary-foreground'
+                    : 'border-border bg-card text-foreground hover:bg-muted'
+                )}
+              >
+                {PRICE_LEVEL_LABELS[level]}
+              </button>
+            )
+          })}
         </div>
         <p className="text-xs text-muted-foreground">
           {value.priceLevels.size === 0
@@ -116,7 +125,7 @@ export function PlaceFilters({ value, onChange }: PlaceFiltersProps) {
           >
             Within
           </Label>
-          <span className="font-heading text-base font-bold text-primary">
+          <span className="font-heading text-base font-bold tabular-nums text-primary">
             {(value.radiusMeters / 1000).toFixed(1)} km
           </span>
         </div>

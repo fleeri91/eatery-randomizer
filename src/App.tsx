@@ -1,7 +1,9 @@
 import { useState } from 'react'
+import { ChevronLeft } from 'lucide-react'
 import { StartScreen } from './views/start-screen'
 import { useNearbyPlaces } from './lib/queries'
 import {
+  CATEGORY_LABELS,
   EMPTY_PRICE_LEVELS,
   type Coordinates,
   type PlaceFilterValues,
@@ -9,7 +11,6 @@ import {
 import { useRandomizer } from './hooks/use-randomizer'
 import { RevealStage } from './components/reveal-stage'
 import { ResultCard } from './components/result-card'
-import { Button } from './components/ui/button'
 
 export default function App() {
   const [submitted, setSubmitted] = useState<{
@@ -56,18 +57,34 @@ export default function App() {
       {submitted && places && (
         <div className="w-full max-w-sm space-y-4">
           <div className="flex items-center justify-between gap-3 px-1">
-            <p className="text-sm text-muted-foreground">
-              {poolSize} place{poolSize === 1 ? '' : 's'} match your filters.
-            </p>
-            <Button
-              size="sm"
-              variant="outline"
-              className="rounded-full"
+            <div className="flex min-w-0 items-center gap-3">
+              <button
+                type="button"
+                aria-label="Back to filters"
+                onClick={() => setSubmitted(null)}
+                className="flex size-9 shrink-0 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-muted"
+              >
+                <ChevronLeft className="size-5" />
+              </button>
+              <div className="min-w-0">
+                <p className="font-heading text-base leading-tight font-extrabold text-foreground">
+                  Whim
+                </p>
+                <p className="truncate text-xs text-muted-foreground">
+                  {CATEGORY_LABELS[submitted.filters.category]} · within{' '}
+                  {(submitted.filters.radiusMeters / 1000).toFixed(1)} km ·{' '}
+                  {poolSize} place{poolSize === 1 ? '' : 's'}
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
               onClick={randomize}
               disabled={poolSize === 0}
+              className="shrink-0 rounded-full border border-border px-3 py-1.5 text-[11px] font-semibold tracking-[0.14em] text-muted-foreground uppercase transition-colors hover:bg-muted disabled:pointer-events-none disabled:opacity-50"
             >
-              🎲 Shuffle
-            </Button>
+              Shuffle
+            </button>
           </div>
           <RevealStage
             revealKey={current?.id ?? null}

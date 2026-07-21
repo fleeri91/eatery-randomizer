@@ -22,6 +22,13 @@ export const CATEGORY_TYPES = {
 
 export type Category = keyof typeof CATEGORY_TYPES
 
+export const CATEGORY_LABELS: Record<Category, string> = {
+  cafe: 'Café',
+  restaurant: 'Restaurant',
+  bar: 'Bar',
+  bakery: 'Bakery',
+}
+
 export interface SearchPlacesParams {
   location: Coordinates
   category: Category
