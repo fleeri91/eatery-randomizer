@@ -44,7 +44,7 @@ export function ResultCard({
   const price = place.priceLevel ? PRICE_SYMBOLS[place.priceLevel] : ''
 
   return (
-    <Card className="w-full max-w-sm mx-auto gap-0 rounded-3xl border-border/70 py-0 shadow-[0_-14px_36px_-18px_oklch(0.5_0.1_40/0.25)]">
+    <Card className="w-full gap-0 rounded-3xl border-border/70 py-0 shadow-[0_-14px_36px_-18px_oklch(0.5_0.1_40/0.25)]">
       <CardContent className="px-6 pt-6 pb-0">
         <div className="flex items-start justify-between gap-3">
           <div>

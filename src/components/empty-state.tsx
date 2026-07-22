@@ -74,7 +74,7 @@ export function EmptyState({
     : `No ${categoryPlural} found within ${radiusKm} km of ${locationLabel || 'this area'}.`
 
   return (
-    <div className="mx-auto flex w-full max-w-sm flex-col items-center px-4 py-10 text-center">
+    <div className="flex w-full flex-1 flex-col items-center justify-center px-4 py-10 text-center sm:flex-none">
       <div className="relative mb-6 size-24">
         <div className="absolute inset-0 rounded-full bg-secondary" />
         <div className="absolute inset-0 flex items-center justify-center">

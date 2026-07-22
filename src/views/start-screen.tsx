@@ -36,8 +36,8 @@ export function StartScreen({ onSubmit }: StartScreenProps) {
 
   return (
     <>
-      <div className="mx-auto w-full max-w-sm overflow-hidden rounded-3xl border border-border bg-card shadow-[0_30px_60px_-20px_oklch(0.4_0.06_40/0.2)]">
-        <div className="flex items-center justify-between gap-3 border-b border-border px-5 py-4">
+      <div className="flex flex-1 flex-col sm:mx-auto sm:w-full sm:max-w-sm sm:flex-none sm:overflow-hidden sm:rounded-3xl sm:border sm:border-border sm:bg-card sm:shadow-[0_30px_60px_-20px_oklch(0.4_0.06_40/0.2)]">
+        <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3.5 sm:px-5 sm:py-4">
           <p className="font-heading text-xl font-extrabold tracking-tight text-foreground">
             Whim
           </p>
@@ -64,9 +64,10 @@ export function StartScreen({ onSubmit }: StartScreenProps) {
           </button>
         </div>
 
-        <div className="relative">
+        <div className="relative flex flex-1 flex-col sm:flex-none">
           <div
             key={locked ? 'locked' : 'unlocked'}
+            className="flex flex-1 flex-col sm:flex-none"
             style={
               !locked
                 ? {
@@ -76,11 +77,11 @@ export function StartScreen({ onSubmit }: StartScreenProps) {
                 : undefined
             }
           >
-            <div className="px-6 py-5">
+            <div className="flex-1 px-5 py-5 sm:flex-none sm:px-6">
               <PlaceFilters disabled={locked} />
             </div>
 
-            <div className="border-t border-border bg-muted/40 px-6 py-5">
+            <div className="border-t border-border bg-muted/40 px-5 py-5 sm:px-6">
               <Button
                 className="w-full rounded-2xl py-6 font-heading text-lg font-bold shadow-[0_10px_24px_-6px_oklch(0.66_0.19_32/0.5)]"
                 disabled={locked}

@@ -36,24 +36,28 @@ export default function App() {
   )
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-6">
+    <div className="flex min-h-dvh w-full flex-col bg-background sm:items-center sm:justify-center sm:p-6">
       {!submitted && <StartScreen onSubmit={() => setSubmitted(true)} />}
 
       {submitted && searching && (
-        <p className="animate-pulse font-heading text-lg font-semibold text-muted-foreground">
-          Scouting the area…
-        </p>
+        <div className="flex flex-1 items-center justify-center p-6 sm:contents">
+          <p className="animate-pulse font-heading text-lg font-semibold text-muted-foreground">
+            Scouting the area…
+          </p>
+        </div>
       )}
 
       {submitted && placesError && (
-        <p className="text-sm font-medium text-destructive">
-          {placesError.message}
-        </p>
+        <div className="flex flex-1 items-center justify-center p-6 sm:contents">
+          <p className="text-sm font-medium text-destructive">
+            {placesError.message}
+          </p>
+        </div>
       )}
 
       {submitted && places && (
-        <div className="w-full max-w-sm space-y-4">
-          <div className="flex items-center gap-3 px-1">
+        <div className="flex flex-1 flex-col sm:w-full sm:max-w-sm sm:flex-none sm:gap-4">
+          <div className="flex items-center gap-3 border-b border-border px-4 py-3.5 sm:border-b-0 sm:px-1 sm:py-0">
             <button
               type="button"
               aria-label="Back to filters"
@@ -73,44 +77,48 @@ export default function App() {
               </p>
             </div>
           </div>
-          {poolSize === 0 ? (
-            <EmptyState
-              category={filters.category}
-              locationLabel={locationLabel}
-              radiusMeters={filters.radiusMeters}
-              maxRadiusMeters={MAX_RADIUS_METERS}
-              hasRawResults={places.length > 0}
-              ratingLabel={
-                filters.minRating > 0
-                  ? `${filters.minRating.toFixed(1)}+`
-                  : null
-              }
-              priceActive={filters.priceLevels.size > 0}
-              onWidenDistance={() => setRadiusMeters(MAX_RADIUS_METERS)}
-              onDropRating={() => setMinRating(0)}
-              onClearPrice={clearPriceLevels}
-              onBackToFilters={() => setSubmitted(false)}
-              onStartFresh={() => {
-                resetFilters()
-                setSubmitted(false)
-              }}
-            />
-          ) : (
-            <RevealStage
-              revealKey={current?.id ?? null}
-              candidateLabels={eligible.map((p) => p.name)}
-              targetLabel={current?.name ?? null}
-            >
-              {current && (
-                <ResultCard
-                  place={current}
-                  category={filters.category}
-                  onReroll={randomize}
-                  onBlock={block}
-                />
-              )}
-            </RevealStage>
-          )}
+          <div className="flex flex-1 flex-col sm:contents">
+            {poolSize === 0 ? (
+              <EmptyState
+                category={filters.category}
+                locationLabel={locationLabel}
+                radiusMeters={filters.radiusMeters}
+                maxRadiusMeters={MAX_RADIUS_METERS}
+                hasRawResults={places.length > 0}
+                ratingLabel={
+                  filters.minRating > 0
+                    ? `${filters.minRating.toFixed(1)}+`
+                    : null
+                }
+                priceActive={filters.priceLevels.size > 0}
+                onWidenDistance={() => setRadiusMeters(MAX_RADIUS_METERS)}
+                onDropRating={() => setMinRating(0)}
+                onClearPrice={clearPriceLevels}
+                onBackToFilters={() => setSubmitted(false)}
+                onStartFresh={() => {
+                  resetFilters()
+                  setSubmitted(false)
+                }}
+              />
+            ) : (
+              <div className="flex flex-1 flex-col justify-center px-4 py-4 sm:contents">
+                <RevealStage
+                  revealKey={current?.id ?? null}
+                  candidateLabels={eligible.map((p) => p.name)}
+                  targetLabel={current?.name ?? null}
+                >
+                  {current && (
+                    <ResultCard
+                      place={current}
+                      category={filters.category}
+                      onReroll={randomize}
+                      onBlock={block}
+                    />
+                  )}
+                </RevealStage>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>

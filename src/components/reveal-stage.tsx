@@ -102,7 +102,7 @@ export function RevealStage({
 
     return (
       <div
-        className="relative w-full max-w-sm mx-auto overflow-hidden rounded-3xl border border-border bg-card"
+        className="relative w-full overflow-hidden rounded-3xl border border-border bg-card"
         style={{ height: WINDOW_HEIGHT }}
       >
         <div
