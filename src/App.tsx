@@ -6,12 +6,18 @@ import { CATEGORY_LABELS } from './types/google-places'
 import { useRandomizer } from './hooks/use-randomizer'
 import { RevealStage } from './components/reveal-stage'
 import { ResultCard } from './components/result-card'
-import { useFilterStore } from './stores/filter-store'
+import { EmptyState } from './components/empty-state'
+import { useFilterStore, MAX_RADIUS_METERS } from './stores/filter-store'
 
 export default function App() {
   const [submitted, setSubmitted] = useState(false)
   const location = useFilterStore((s) => s.location)
+  const locationLabel = useFilterStore((s) => s.locationLabel)
   const filters = useFilterStore((s) => s.filters)
+  const setRadiusMeters = useFilterStore((s) => s.setRadiusMeters)
+  const setMinRating = useFilterStore((s) => s.setMinRating)
+  const clearPriceLevels = useFilterStore((s) => s.clearPriceLevels)
+  const resetFilters = useFilterStore((s) => s.reset)
 
   const {
     data: places,
@@ -67,20 +73,44 @@ export default function App() {
               </p>
             </div>
           </div>
-          <RevealStage
-            revealKey={current?.id ?? null}
-            candidateLabels={eligible.map((p) => p.name)}
-            targetLabel={current?.name ?? null}
-          >
-            {current && (
-              <ResultCard
-                place={current}
-                category={filters.category}
-                onReroll={randomize}
-                onBlock={block}
-              />
-            )}
-          </RevealStage>
+          {poolSize === 0 ? (
+            <EmptyState
+              category={filters.category}
+              locationLabel={locationLabel}
+              radiusMeters={filters.radiusMeters}
+              maxRadiusMeters={MAX_RADIUS_METERS}
+              hasRawResults={places.length > 0}
+              ratingLabel={
+                filters.minRating > 0
+                  ? `${filters.minRating.toFixed(1)}+`
+                  : null
+              }
+              priceActive={filters.priceLevels.size > 0}
+              onWidenDistance={() => setRadiusMeters(MAX_RADIUS_METERS)}
+              onDropRating={() => setMinRating(0)}
+              onClearPrice={clearPriceLevels}
+              onBackToFilters={() => setSubmitted(false)}
+              onStartFresh={() => {
+                resetFilters()
+                setSubmitted(false)
+              }}
+            />
+          ) : (
+            <RevealStage
+              revealKey={current?.id ?? null}
+              candidateLabels={eligible.map((p) => p.name)}
+              targetLabel={current?.name ?? null}
+            >
+              {current && (
+                <ResultCard
+                  place={current}
+                  category={filters.category}
+                  onReroll={randomize}
+                  onBlock={block}
+                />
+              )}
+            </RevealStage>
+          )}
         </div>
       )}
     </div>

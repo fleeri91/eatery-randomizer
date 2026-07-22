@@ -6,11 +6,13 @@ import {
   type PriceLevel,
 } from '@/types/google-places'
 
+export const MAX_RADIUS_METERS = 3000
+
 function createDefaultFilters(): PlaceFilterValues {
   return {
     category: 'cafe',
     minRating: 0,
-    radiusMeters: 3000,
+    radiusMeters: MAX_RADIUS_METERS,
     priceLevels: new Set(),
   }
 }
@@ -24,6 +26,7 @@ interface FilterStore {
   setMinRating: (minRating: number) => void
   setRadiusMeters: (radiusMeters: number) => void
   togglePriceLevel: (level: PriceLevel) => void
+  clearPriceLevels: () => void
   reset: () => void
 }
 
@@ -51,6 +54,11 @@ export const useFilterStore = create<FilterStore>((set) => ({
         : priceLevels.add(level)
       return { filters: { ...state.filters, priceLevels } }
     }),
+
+  clearPriceLevels: () =>
+    set((state) => ({
+      filters: { ...state.filters, priceLevels: new Set() },
+    })),
 
   reset: () =>
     set({ location: null, locationLabel: '', filters: createDefaultFilters() }),

@@ -1,7 +1,7 @@
 import { Label } from './ui/label'
 import { Slider } from './ui/slider'
 import { cn } from '@/lib/utils'
-import { useFilterStore } from '@/stores/filter-store'
+import { useFilterStore, MAX_RADIUS_METERS } from '@/stores/filter-store'
 import {
   CATEGORY_LABELS,
   CATEGORY_TYPES,
@@ -132,7 +132,7 @@ export function PlaceFilters({ disabled = false }: PlaceFiltersProps) {
         <Slider
           id="radius"
           min={0}
-          max={3000}
+          max={MAX_RADIUS_METERS}
           step={100}
           value={[value.radiusMeters]}
           disabled={disabled}
