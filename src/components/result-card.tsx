@@ -3,7 +3,7 @@ import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api'
 import { ChevronLeft } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { directionsLink, PRICE_SYMBOLS } from '@/lib/place-links'
+import { directionsLink, placeInfoLink, PRICE_SYMBOLS } from '@/lib/place-links'
 import {
   CATEGORY_LABELS,
   type Coordinates,
@@ -29,6 +29,21 @@ const CLEAN_MAP_STYLES: google.maps.MapTypeStyle[] = [
   { elementType: 'labels', stylers: [{ visibility: 'off' }] },
 ]
 
+const staticMapOptions: google.maps.MapOptions = {
+  // Disable map manipulations
+  gestureHandling: 'none', // Disables pan, zoom, pinch, and scroll
+  zoomControl: false, // Removes zoom +/- buttons
+  mapTypeControl: false, // Removes Map/Satellite toggle
+  scaleControl: false, // Removes scale bar
+  streetViewControl: false, // Removes Pegman street view icon
+  rotateControl: false, // Removes rotation control
+  fullscreenControl: false, // Removes fullscreen button
+  keyboardShortcuts: false, // Disables keyboard arrows/navigation
+  clickableIcons: false, // Prevents clicking POIs (restaurants, parks, etc.)
+  disableDefaultUI: true, // Safety catch to turn off all standard UI controls
+  styles: CLEAN_MAP_STYLES,
+}
+
 function PlaceMap({ place }: { place: Place }) {
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
@@ -42,10 +57,7 @@ function PlaceMap({ place }: { place: Place }) {
       mapContainerClassName="size-full"
       center={place.location}
       zoom={15}
-      options={{
-        disableDefaultUI: true,
-        styles: CLEAN_MAP_STYLES,
-      }}
+      options={staticMapOptions}
     >
       <Marker position={place.location} />
     </GoogleMap>
@@ -72,12 +84,26 @@ export function ResultCard({
       style={{ animation: 'sheet-up 500ms cubic-bezier(0.2, 0.8, 0.2, 1)' }}
     >
       <div className="relative h-[300px] shrink-0 overflow-hidden bg-muted">
-        <PlaceMap place={place} />
+        {/* Clickable link wrapping the static map */}
+        <a
+          href={placeInfoLink(place)}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`Open ${place.name} in Google Maps`}
+          className="block size-full cursor-pointer"
+        >
+          {/* pointer-events-none lets mouse clicks pass directly to the anchor wrapper */}
+          <div className="size-full pointer-events-none">
+            <PlaceMap place={place} />
+          </div>
+        </a>
+
+        {/* Floating back button sitting on top of the link */}
         <button
           type="button"
           aria-label="Back to filters"
           onClick={onBack}
-          className="absolute top-4 left-4 flex size-10 items-center justify-center rounded-full bg-card/90 text-foreground shadow-[0_4px_12px_oklch(0.4_0.06_40/0.25)]"
+          className="absolute top-4 left-4 z-10 flex size-10 items-center justify-center rounded-full bg-card/90 text-foreground shadow-[0_4px_12px_oklch(0.4_0.06_40/0.25)] transition-transform active:scale-95"
         >
           <ChevronLeft className="size-5" />
         </button>

@@ -34,3 +34,17 @@ export function directionsLink(
   url.searchParams.set('destination_place_id', place.id)
   return url.toString()
 }
+
+export function placeInfoLink(place: Place): string {
+  // If you have a Google Place ID, this opens the exact place details page:
+  if (place.id) {
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.name)}&query_place_id=${place.id}`
+  }
+
+  // Fallback if no place ID is available:
+  if (place.address) {
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${place.name}, ${place.address}`)}`
+  }
+
+  return `https://www.google.com/maps/search/?api=1&query=${place.location.lat},${place.location.lng}`
+}
