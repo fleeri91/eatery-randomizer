@@ -1,4 +1,6 @@
-import { Card, CardContent } from '@/components/ui/card'
+import { createPortal } from 'react-dom'
+import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api'
+import { ChevronLeft } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { googleMapsLink, PRICE_SYMBOLS } from '@/lib/place-links'
@@ -13,15 +15,39 @@ interface ResultCardProps {
   category: Category
   onReroll: () => void
   onBlock: (id: string) => void
+  onBack: () => void
 }
 
-const EMBED_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string
+const MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string
 
-function mapEmbedSrc(placeId: string): string {
-  const url = new URL('https://www.google.com/maps/embed/v1/place')
-  url.searchParams.set('key', EMBED_API_KEY)
-  url.searchParams.set('q', `place_id:${placeId}`)
-  return url.toString()
+// Hides all default labels (streets, POIs, transit) so the hero reads as a
+// clean, minimal map instead of a busy embed — just roads/terrain and our
+// own marker.
+const CLEAN_MAP_STYLES: google.maps.MapTypeStyle[] = [
+  { elementType: 'labels', stylers: [{ visibility: 'off' }] },
+]
+
+function PlaceMap({ place }: { place: Place }) {
+  const { isLoaded } = useJsApiLoader({
+    id: 'google-map-script',
+    googleMapsApiKey: MAPS_API_KEY,
+  })
+
+  if (!isLoaded) return null
+
+  return (
+    <GoogleMap
+      mapContainerClassName="size-full"
+      center={place.location}
+      zoom={15}
+      options={{
+        disableDefaultUI: true,
+        styles: CLEAN_MAP_STYLES,
+      }}
+    >
+      <Marker position={place.location} />
+    </GoogleMap>
+  )
 }
 
 export function ResultCard({
@@ -29,39 +55,59 @@ export function ResultCard({
   category,
   onReroll,
   onBlock,
+  onBack,
 }: ResultCardProps) {
   const price = place.priceLevel ? PRICE_SYMBOLS[place.priceLevel] : ''
 
-  return (
-    <Card className="w-full gap-0 rounded-3xl border-border/70 py-0 shadow-[0_-14px_36px_-18px_oklch(0.5_0.1_40/0.25)]">
-      <CardContent className="px-6 pt-6 pb-0">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <h2 className="font-heading text-3xl leading-[1.05] font-extrabold tracking-tight text-foreground">
+  // Rendered via a portal (rather than in RevealStage's normal flow) so this
+  // full-screen takeover isn't clipped by an ancestor's `sheet-up` transform
+  // — a transformed ancestor would otherwise become the containing block for
+  // `fixed`, breaking the viewport-relative layout.
+  return createPortal(
+    <div
+      className="fixed inset-0 z-30 flex flex-col bg-background"
+      style={{ animation: 'sheet-up 500ms cubic-bezier(0.2, 0.8, 0.2, 1)' }}
+    >
+      <div className="relative h-[300px] shrink-0 overflow-hidden bg-muted">
+        <PlaceMap place={place} />
+        <button
+          type="button"
+          aria-label="Back to filters"
+          onClick={onBack}
+          className="absolute top-4 left-4 flex size-10 items-center justify-center rounded-full bg-card/90 text-foreground shadow-[0_4px_12px_oklch(0.4_0.06_40/0.25)]"
+        >
+          <ChevronLeft className="size-5" />
+        </button>
+      </div>
+
+      <div className="flex-1 overflow-y-auto px-6 py-5">
+        <div className="flex items-start justify-between gap-3.5">
+          <div className="min-w-0">
+            <h2 className="font-heading text-[34px] leading-[1.0] font-extrabold tracking-tight text-foreground">
               {place.name}
             </h2>
-            <p className="mt-1.5 text-sm text-muted-foreground">
+            <p className="mt-2 text-sm text-muted-foreground">
               {place.address}
             </p>
           </div>
-          {place.rating !== null ? (
-            <div className="flex-shrink-0 text-center">
-              <div className="font-heading text-2xl font-extrabold tabular-nums text-primary">
+          {place.rating !== null && (
+            <div className="flex-shrink-0 rounded-2xl bg-secondary px-3.5 py-2.5 text-center">
+              <div className="font-heading text-[26px] leading-none font-extrabold text-primary">
                 {place.rating.toFixed(1)}
               </div>
-              <div className="text-[10px] font-semibold tracking-[0.14em] text-muted-foreground/80">
+              <div className="mt-0.5 text-[10px] font-semibold tracking-[0.14em] text-muted-foreground">
                 RATING
               </div>
             </div>
-          ) : null}
+          )}
         </div>
 
-        <div className="mt-3 flex flex-wrap gap-2">
-          <span className="rounded-full border border-border bg-muted px-3 py-1.5 text-xs font-medium text-foreground/80">
+        <div className="mt-4 flex flex-wrap gap-2">
+          <span className="rounded-full border border-border bg-muted px-3.5 py-1.5 text-[13px] font-medium text-foreground/80">
             {CATEGORY_LABELS[category]}
           </span>
           {price && (
-            <span className="rounded-full border border-border bg-muted px-3 py-1.5 text-xs font-medium text-foreground/80">
+            <span className="rounded-full border border-border bg-muted px-3.5 py-1.5 text-[13px] font-medium text-foreground/80">
               {price}
             </span>
           )}
@@ -81,28 +127,18 @@ export function ResultCard({
             {place.userRatingCount} ratings
           </p>
         )}
+      </div>
 
-        <div className="mt-4 overflow-hidden rounded-2xl border border-border/70">
-          <iframe
-            title={`Map showing ${place.name}`}
-            width="100%"
-            height="180"
-            style={{ border: 0, display: 'block' }}
-            loading="lazy"
-            src={mapEmbedSrc(place.id)}
-          />
-        </div>
-
+      <div className="border-t border-border bg-muted/40 px-6 py-4">
         <a
           href={googleMapsLink(place.id)}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-4 block w-full rounded-2xl bg-foreground py-3.5 text-center text-sm font-semibold text-background transition-colors hover:bg-foreground/90"
+          className="block w-full rounded-2xl bg-foreground py-3.5 text-center text-sm font-semibold text-background transition-colors hover:bg-foreground/90"
         >
           Get directions
         </a>
-
-        <div className="mt-2.5 flex gap-2.5 pb-6">
+        <div className="mt-2.5 flex gap-2.5">
           <Button
             className="flex-1 rounded-2xl py-5 text-sm font-bold"
             onClick={onReroll}
@@ -117,7 +153,8 @@ export function ResultCard({
             Not this one
           </Button>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>,
+    document.body
   )
 }

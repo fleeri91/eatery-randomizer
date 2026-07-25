@@ -147,6 +147,7 @@ export default function App() {
                       category={filters.category}
                       onReroll={randomize}
                       onBlock={block}
+                      onBack={() => setSubmitted(false)}
                     />
                   )}
                 </RevealStage>

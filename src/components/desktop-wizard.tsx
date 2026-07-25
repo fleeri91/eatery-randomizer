@@ -132,7 +132,7 @@ export function DesktopWizard({
   const setLocation = useFilterStore((s) => s.setLocation)
   const [locOpen, setLocOpen] = useState(false)
   const [revealPhase, setRevealPhase] = useState<
-    'idle' | 'cycling' | 'settled'
+    'idle' | 'cycling' | 'landed' | 'settled'
   >('idle')
   const unlockTimeout = useRef<number | undefined>(undefined)
 
@@ -206,7 +206,7 @@ export function DesktopWizard({
 
             {!searching && !placesError && poolSize > 0 && (
               <>
-                {revealPhase === 'cycling' && (
+                {(revealPhase === 'cycling' || revealPhase === 'landed') && (
                   <p className="mb-6 font-heading text-2xl font-extrabold tracking-tight text-foreground">
                     Letting chance decide…
                   </p>

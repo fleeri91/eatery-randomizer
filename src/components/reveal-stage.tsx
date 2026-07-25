@@ -16,7 +16,12 @@ interface RevealStageProps {
   onPhaseChange?: (phase: Phase) => void
 }
 
-type Phase = 'idle' | 'cycling' | 'settled'
+type Phase = 'idle' | 'cycling' | 'landed' | 'settled'
+
+/** How long the landing polish (stamp + underline sweep + frame pop) plays
+ *  before the reel gives way to the settled result. Must comfortably cover
+ *  win-stamp (500ms) and win-sweep (400ms + 120ms delay). */
+const LANDING_POLISH_MS = 560
 
 const ROW_HEIGHT = 64
 const WINDOW_HEIGHT = 224
@@ -38,6 +43,7 @@ export function RevealStage({
   const [progress, setProgress] = useState(0)
   const prevKey = useRef<string | null>(null)
   const rafRef = useRef<number | undefined>(undefined)
+  const landTimeoutRef = useRef<number | undefined>(undefined)
 
   useEffect(() => {
     onPhaseChange?.(phase)
@@ -77,23 +83,30 @@ export function RevealStage({
       if (p < 1) {
         rafRef.current = requestAnimationFrame(step)
       } else {
-        setPhase('settled')
+        setPhase('landed')
+        landTimeoutRef.current = window.setTimeout(
+          () => setPhase('settled'),
+          LANDING_POLISH_MS
+        )
       }
     }
     rafRef.current = requestAnimationFrame(step)
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current)
+      window.clearTimeout(landTimeoutRef.current)
     }
   }, [revealKey, candidateLabels.length, cycleDurationMs])
 
   useEffect(
     () => () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current)
+      window.clearTimeout(landTimeoutRef.current)
     },
     []
   )
 
-  if (phase === 'cycling') {
+  if (phase === 'cycling' || phase === 'landed') {
+    const landed = phase === 'landed'
     const targetIndex = Math.max(
       targetLabel ? candidateLabels.indexOf(targetLabel) : 0,
       0
@@ -107,8 +120,8 @@ export function RevealStage({
     const landingRow = (REPEATS - 2) * candidateLabels.length + targetIndex
     const finalOffset =
       landingRow * ROW_HEIGHT - (WINDOW_HEIGHT / 2 - ROW_HEIGHT / 2)
-    const translate = finalOffset * progress
-    const blur = Math.min(9, (1 - progress) * 26)
+    const translate = landed ? finalOffset : finalOffset * progress
+    const blur = landed ? 0 : Math.min(9, (1 - progress) * 26)
 
     return (
       <div
@@ -122,19 +135,50 @@ export function RevealStage({
             filter: blur ? `blur(${blur}px)` : 'none',
           }}
         >
-          {strip.map((item) => (
-            <div
-              key={item.row}
-              className="flex items-center justify-center px-4 text-center font-heading text-lg font-extrabold text-foreground"
-              style={{ height: ROW_HEIGHT }}
-            >
-              {item.label}
-            </div>
-          ))}
+          {strip.map((item) => {
+            const isWinner = landed && item.row === landingRow
+            return (
+              <div
+                key={item.row}
+                className="relative flex items-center justify-center px-4 text-center font-heading text-lg font-extrabold text-foreground"
+                style={{
+                  height: ROW_HEIGHT,
+                  opacity: landed && !isWinner ? 0.32 : 1,
+                  transition: landed ? 'opacity 350ms' : undefined,
+                }}
+              >
+                <span
+                  style={
+                    isWinner
+                      ? {
+                          display: 'inline-block',
+                          animation:
+                            'win-stamp 500ms cubic-bezier(0.2, 0.9, 0.25, 1)',
+                        }
+                      : undefined
+                  }
+                >
+                  {item.label}
+                </span>
+                {isWinner && (
+                  <span
+                    className="pointer-events-none absolute left-1/2 h-1 w-[46px] -translate-x-1/2 rounded-full bg-primary"
+                    style={{ top: 44, animation: 'win-sweep 400ms ease 120ms both' }}
+                  />
+                )}
+              </div>
+            )
+          })}
         </div>
         <div
           className="pointer-events-none absolute left-2 right-2 rounded-2xl border-2 border-primary bg-primary/5"
-          style={{ top: `calc(50% - ${ROW_HEIGHT / 2}px)`, height: ROW_HEIGHT }}
+          style={{
+            top: `calc(50% - ${ROW_HEIGHT / 2}px)`,
+            height: ROW_HEIGHT,
+            animation: landed
+              ? 'frame-pop 500ms cubic-bezier(0.2, 0.8, 0.2, 1)'
+              : undefined,
+          }}
         />
         <div className="pointer-events-none absolute inset-x-0 top-0 h-14 bg-gradient-to-b from-card to-transparent" />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-card to-transparent" />
