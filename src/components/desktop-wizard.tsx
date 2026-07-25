@@ -1,0 +1,244 @@
+import { useEffect, useRef, useState } from 'react'
+import { ChevronLeft } from 'lucide-react'
+import { PlaceFilters } from '@/components/place-filter'
+import { LocationSheet } from '@/components/location-sheet'
+import { RevealStage } from '@/components/reveal-stage'
+import { DesktopResultCard } from '@/components/desktop-result-card'
+import { EmptyState } from '@/components/empty-state'
+import { useFilterStore } from '@/stores/filter-store'
+import {
+  type Category,
+  type Coordinates,
+  type Place,
+} from '@/types/google-places'
+
+interface DesktopWizardProps {
+  submitted: boolean
+  onSubmit: () => void
+  onBackToFilters: () => void
+  searching: boolean
+  placesError: Error | null
+  places: Place[] | undefined
+  current: Place | null
+  eligible: Place[]
+  poolSize: number
+  onReroll: () => void
+  onBlock: (id: string) => void
+  category: Category
+  locationLabel: string
+  maxRadiusMeters: number
+  radiusMeters: number
+  minRating: number
+  priceActive: boolean
+  onWidenDistance: () => void
+  onDropRating: () => void
+  onClearPrice: () => void
+  onStartFresh: () => void
+}
+
+function FiltersPanel({
+  onOpenLocation,
+  onSubmit,
+}: {
+  onOpenLocation: () => void
+  onSubmit: () => void
+}) {
+  const location = useFilterStore((s) => s.location)
+  const locked = !location
+
+  return (
+    <div className="flex w-[640px] max-w-full flex-col bg-card">
+      <div className="relative flex-1 overflow-y-auto px-6 py-5">
+        <div
+          style={
+            !locked
+              ? {
+                  animation:
+                    'filters-in 500ms cubic-bezier(0.2, 0.8, 0.2, 1) both',
+                }
+              : undefined
+          }
+        >
+          <PlaceFilters disabled={locked} />
+        </div>
+
+        {locked && (
+          <div
+            className="absolute inset-0 flex flex-col items-center justify-center px-10 text-center backdrop-blur-sm"
+            style={{ background: 'oklch(0.985 0.015 70 / 0.75)' }}
+          >
+            <div className="mb-4 flex size-14 items-center justify-center rounded-full bg-secondary">
+              <span className="size-5 shrink-0 rotate-[-45deg] rounded-[50%_50%_50%_0] bg-primary" />
+            </div>
+            <p className="font-heading text-xl font-extrabold tracking-tight text-foreground">
+              Where are you?
+            </p>
+            <p className="mt-2 max-w-[240px] text-sm text-muted-foreground">
+              Whim needs a place to search before you can set the rest. Pick a
+              location to unlock the filters.
+            </p>
+            <button
+              type="button"
+              onClick={onOpenLocation}
+              className="mt-5 rounded-2xl bg-primary px-6 py-3.5 font-heading text-base font-bold text-primary-foreground shadow-[0_10px_24px_-6px_oklch(0.66_0.19_32/0.5)]"
+            >
+              Choose a location
+            </button>
+          </div>
+        )}
+      </div>
+
+      {!locked && (
+        <div className="border-t border-border bg-muted/40 px-6 py-5">
+          <button
+            type="button"
+            onClick={onSubmit}
+            className="w-full rounded-2xl bg-primary py-4 font-heading text-lg font-bold text-primary-foreground shadow-[0_10px_24px_-6px_oklch(0.66_0.19_32/0.5)]"
+          >
+            Shuffle the block
+          </button>
+          <p className="mt-2.5 text-center text-xs text-muted-foreground">
+            Whim picks one at random from what fits.
+          </p>
+        </div>
+      )}
+    </div>
+  )
+}
+
+export function DesktopWizard({
+  submitted,
+  onSubmit,
+  onBackToFilters,
+  searching,
+  placesError,
+  places,
+  current,
+  eligible,
+  poolSize,
+  onReroll,
+  onBlock,
+  category,
+  locationLabel,
+  maxRadiusMeters,
+  radiusMeters,
+  minRating,
+  priceActive,
+  onWidenDistance,
+  onDropRating,
+  onClearPrice,
+  onStartFresh,
+}: DesktopWizardProps) {
+  const setLocation = useFilterStore((s) => s.setLocation)
+  const [locOpen, setLocOpen] = useState(false)
+  const [revealPhase, setRevealPhase] = useState<
+    'idle' | 'cycling' | 'settled'
+  >('idle')
+  const unlockTimeout = useRef<number | undefined>(undefined)
+
+  useEffect(() => () => window.clearTimeout(unlockTimeout.current), [])
+
+  function handleLocationSelect(loc: Coordinates, label: string) {
+    setLocation(loc, label)
+    setLocOpen(false)
+  }
+
+  return (
+    <div className="flex min-h-dvh w-full flex-col bg-background">
+      <div className="relative flex flex-1 justify-center overflow-hidden bg-background">
+        {submitted && (
+          <button
+            type="button"
+            onClick={onBackToFilters}
+            className="absolute top-6 left-6 z-10 flex items-center gap-1.5 rounded-full border border-border bg-card px-3.5 py-2 text-sm font-semibold text-foreground/80 shadow-sm transition-colors hover:bg-muted"
+          >
+            <ChevronLeft className="size-3.5" /> Back
+          </button>
+        )}
+
+        {!submitted && (
+          <FiltersPanel
+            onOpenLocation={() => setLocOpen(true)}
+            onSubmit={onSubmit}
+          />
+        )}
+
+        {submitted && (
+          <div
+            className="flex flex-1 flex-col items-center justify-center p-10"
+            style={{
+              background:
+                'radial-gradient(circle at 50% 32%, oklch(0.99 0.02 72), oklch(0.965 0.025 65))',
+            }}
+          >
+            {searching && (
+              <p className="animate-pulse font-heading text-lg font-semibold text-muted-foreground">
+                Scouting the area…
+              </p>
+            )}
+
+            {!searching && placesError && (
+              <p className="text-sm font-medium text-destructive">
+                {placesError.message}
+              </p>
+            )}
+
+            {!searching && !placesError && poolSize === 0 && (
+              <div className="w-[460px] max-w-full">
+                <EmptyState
+                  category={category}
+                  locationLabel={locationLabel}
+                  radiusMeters={radiusMeters}
+                  maxRadiusMeters={maxRadiusMeters}
+                  hasRawResults={(places?.length ?? 0) > 0}
+                  ratingLabel={
+                    minRating > 0 ? `${minRating.toFixed(1)}+` : null
+                  }
+                  priceActive={priceActive}
+                  onWidenDistance={onWidenDistance}
+                  onDropRating={onDropRating}
+                  onClearPrice={onClearPrice}
+                  onBackToFilters={onBackToFilters}
+                  onStartFresh={onStartFresh}
+                />
+              </div>
+            )}
+
+            {!searching && !placesError && poolSize > 0 && (
+              <>
+                {revealPhase === 'cycling' && (
+                  <p className="mb-6 font-heading text-2xl font-extrabold tracking-tight text-foreground">
+                    Letting chance decide…
+                  </p>
+                )}
+                <div className="w-[460px] max-w-full">
+                  <RevealStage
+                    revealKey={current?.id ?? null}
+                    candidateLabels={eligible.map((p) => p.name)}
+                    targetLabel={current?.name ?? null}
+                    onPhaseChange={setRevealPhase}
+                  >
+                    {current && (
+                      <DesktopResultCard
+                        place={current}
+                        category={category}
+                        onReroll={onReroll}
+                        onBlock={onBlock}
+                      />
+                    )}
+                  </RevealStage>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+      </div>
+
+      <LocationSheet
+        open={locOpen}
+        onOpenChange={setLocOpen}
+        onSelect={handleLocationSelect}
+      />
+    </div>
+  )
+}

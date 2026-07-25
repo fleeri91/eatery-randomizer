@@ -10,6 +10,10 @@ interface RevealStageProps {
   /** The actual result content, shown once the reel settles. */
   children: React.ReactNode
   cycleDurationMs?: number
+  /** Notified whenever the reel's phase changes — lets a parent (e.g. a
+   *  desktop step indicator) track spinning vs. settled without duplicating
+   *  the animation logic. */
+  onPhaseChange?: (phase: Phase) => void
 }
 
 type Phase = 'idle' | 'cycling' | 'settled'
@@ -28,11 +32,17 @@ export function RevealStage({
   targetLabel,
   children,
   cycleDurationMs = 2200,
+  onPhaseChange,
 }: RevealStageProps) {
   const [phase, setPhase] = useState<Phase>('idle')
   const [progress, setProgress] = useState(0)
   const prevKey = useRef<string | null>(null)
   const rafRef = useRef<number | undefined>(undefined)
+
+  useEffect(() => {
+    onPhaseChange?.(phase)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase])
 
   useEffect(() => {
     if (revealKey === null) {

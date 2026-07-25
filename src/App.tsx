@@ -4,12 +4,15 @@ import { StartScreen } from './views/start-screen'
 import { useNearbyPlaces } from './lib/queries'
 import { CATEGORY_LABELS } from './types/google-places'
 import { useRandomizer } from './hooks/use-randomizer'
+import { useMediaQuery } from './hooks/use-media-query'
 import { RevealStage } from './components/reveal-stage'
 import { ResultCard } from './components/result-card'
 import { EmptyState } from './components/empty-state'
+import { DesktopWizard } from './components/desktop-wizard'
 import { useFilterStore, MAX_RADIUS_METERS } from './stores/filter-store'
 
 export default function App() {
+  const isDesktop = useMediaQuery('(min-width: 1024px)')
   const [submitted, setSubmitted] = useState(false)
   const location = useFilterStore((s) => s.location)
   const locationLabel = useFilterStore((s) => s.locationLabel)
@@ -34,6 +37,37 @@ export default function App() {
     filters.minRating,
     filters.priceLevels
   )
+
+  if (isDesktop) {
+    return (
+      <DesktopWizard
+        submitted={submitted}
+        onSubmit={() => setSubmitted(true)}
+        onBackToFilters={() => setSubmitted(false)}
+        searching={submitted && searching}
+        placesError={submitted ? placesError : null}
+        places={places}
+        current={current}
+        eligible={eligible}
+        poolSize={poolSize}
+        onReroll={randomize}
+        onBlock={block}
+        category={filters.category}
+        locationLabel={locationLabel}
+        maxRadiusMeters={MAX_RADIUS_METERS}
+        radiusMeters={filters.radiusMeters}
+        minRating={filters.minRating}
+        priceActive={filters.priceLevels.size > 0}
+        onWidenDistance={() => setRadiusMeters(MAX_RADIUS_METERS)}
+        onDropRating={() => setMinRating(0)}
+        onClearPrice={clearPriceLevels}
+        onStartFresh={() => {
+          resetFilters()
+          setSubmitted(false)
+        }}
+      />
+    )
+  }
 
   return (
     <div className="flex min-h-dvh w-full flex-col bg-background sm:items-center sm:justify-center sm:p-6">

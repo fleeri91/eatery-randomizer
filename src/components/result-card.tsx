@@ -1,6 +1,7 @@
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { googleMapsLink, PRICE_SYMBOLS } from '@/lib/place-links'
 import {
   CATEGORY_LABELS,
   type Place,
@@ -14,14 +15,6 @@ interface ResultCardProps {
   onBlock: (id: string) => void
 }
 
-const PRICE_SYMBOLS: Record<string, string> = {
-  PRICE_LEVEL_FREE: '',
-  PRICE_LEVEL_INEXPENSIVE: '$',
-  PRICE_LEVEL_MODERATE: '$$',
-  PRICE_LEVEL_EXPENSIVE: '$$$',
-  PRICE_LEVEL_VERY_EXPENSIVE: '$$$$',
-}
-
 const EMBED_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string
 
 function mapEmbedSrc(placeId: string): string {
@@ -29,10 +22,6 @@ function mapEmbedSrc(placeId: string): string {
   url.searchParams.set('key', EMBED_API_KEY)
   url.searchParams.set('q', `place_id:${placeId}`)
   return url.toString()
-}
-
-function googleMapsLink(placeId: string): string {
-  return `https://www.google.com/maps/place/?q=place_id:${placeId}`
 }
 
 export function ResultCard({
