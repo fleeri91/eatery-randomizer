@@ -145,6 +145,7 @@ export default function App() {
                     <ResultCard
                       place={current}
                       category={filters.category}
+                      origin={location}
                       onReroll={randomize}
                       onBlock={block}
                       onBack={() => setSubmitted(false)}

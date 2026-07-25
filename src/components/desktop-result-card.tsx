@@ -1,8 +1,9 @@
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { googleMapsLink, PRICE_SYMBOLS } from '@/lib/place-links'
+import { directionsLink, PRICE_SYMBOLS } from '@/lib/place-links'
 import {
   CATEGORY_LABELS,
+  type Coordinates,
   type Place,
   type Category,
 } from '@/types/google-places'
@@ -10,6 +11,7 @@ import {
 interface DesktopResultCardProps {
   place: Place
   category: Category
+  origin: Coordinates | null
   onReroll: () => void
   onBlock: (id: string) => void
 }
@@ -17,6 +19,7 @@ interface DesktopResultCardProps {
 export function DesktopResultCard({
   place,
   category,
+  origin,
   onReroll,
   onBlock,
 }: DesktopResultCardProps) {
@@ -73,7 +76,7 @@ export function DesktopResultCard({
         )}
 
         <a
-          href={googleMapsLink(place.id)}
+          href={directionsLink(place, origin)}
           target="_blank"
           rel="noopener noreferrer"
           className="mt-6 block w-full rounded-2xl bg-foreground py-3.5 text-center text-sm font-semibold text-background transition-colors hover:bg-foreground/90"

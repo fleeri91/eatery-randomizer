@@ -3,9 +3,10 @@ import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api'
 import { ChevronLeft } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { googleMapsLink, PRICE_SYMBOLS } from '@/lib/place-links'
+import { directionsLink, PRICE_SYMBOLS } from '@/lib/place-links'
 import {
   CATEGORY_LABELS,
+  type Coordinates,
   type Place,
   type Category,
 } from '@/types/google-places'
@@ -13,6 +14,7 @@ import {
 interface ResultCardProps {
   place: Place
   category: Category
+  origin: Coordinates | null
   onReroll: () => void
   onBlock: (id: string) => void
   onBack: () => void
@@ -53,6 +55,7 @@ function PlaceMap({ place }: { place: Place }) {
 export function ResultCard({
   place,
   category,
+  origin,
   onReroll,
   onBlock,
   onBack,
@@ -131,7 +134,7 @@ export function ResultCard({
 
       <div className="border-t border-border bg-muted/40 px-6 py-4">
         <a
-          href={googleMapsLink(place.id)}
+          href={directionsLink(place, origin)}
           target="_blank"
           rel="noopener noreferrer"
           className="block w-full rounded-2xl bg-foreground py-3.5 text-center text-sm font-semibold text-background transition-colors hover:bg-foreground/90"

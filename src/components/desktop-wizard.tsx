@@ -129,6 +129,7 @@ export function DesktopWizard({
   onClearPrice,
   onStartFresh,
 }: DesktopWizardProps) {
+  const location = useFilterStore((s) => s.location)
   const setLocation = useFilterStore((s) => s.setLocation)
   const [locOpen, setLocOpen] = useState(false)
   const [revealPhase, setRevealPhase] = useState<
@@ -222,6 +223,7 @@ export function DesktopWizard({
                       <DesktopResultCard
                         place={current}
                         category={category}
+                        origin={location}
                         onReroll={onReroll}
                         onBlock={onBlock}
                       />
