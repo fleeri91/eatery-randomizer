@@ -21,11 +21,148 @@ interface ResultCardProps {
 
 const MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string
 
-// Hides all default labels (streets, POIs, transit) so the hero reads as a
-// clean, minimal map instead of a busy embed — just roads/terrain and our
-// own marker.
+// Dark, desaturated theme matching the app's palette so the embedded map
+// reads as part of the UI instead of a bright rectangle cut into it.
 const CLEAN_MAP_STYLES: google.maps.MapTypeStyle[] = [
-  { elementType: 'labels', stylers: [{ visibility: 'off' }] },
+  { elementType: 'geometry', stylers: [{ color: '#141110' }] },
+  { elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
+  { elementType: 'labels.text.fill', stylers: [{ color: '#9C8F7F' }] },
+  { elementType: 'labels.text.stroke', stylers: [{ color: '#141110' }] },
+
+  {
+    featureType: 'administrative',
+    elementType: 'geometry',
+    stylers: [{ color: '#37302A' }],
+  },
+  {
+    featureType: 'administrative.country',
+    elementType: 'labels.text.fill',
+    stylers: [{ color: '#C3B7A6' }],
+  },
+  { featureType: 'administrative.land_parcel', stylers: [{ visibility: 'off' }] },
+  {
+    featureType: 'administrative.locality',
+    elementType: 'labels.text.fill',
+    stylers: [{ color: '#C3B7A6' }],
+  },
+  {
+    featureType: 'administrative.neighborhood',
+    elementType: 'labels.text.fill',
+    stylers: [{ color: '#8A7C6B' }],
+  },
+
+  {
+    featureType: 'landscape.man_made',
+    elementType: 'geometry',
+    stylers: [{ color: '#1C1816' }],
+  },
+  {
+    featureType: 'landscape.natural',
+    elementType: 'geometry',
+    stylers: [{ color: '#181413' }],
+  },
+
+  { featureType: 'poi', elementType: 'geometry', stylers: [{ color: '#1F1A17' }] },
+  {
+    featureType: 'poi',
+    elementType: 'labels.text.fill',
+    stylers: [{ color: '#6E6154' }],
+  },
+  { featureType: 'poi.business', stylers: [{ visibility: 'off' }] },
+  {
+    featureType: 'poi.park',
+    elementType: 'geometry',
+    stylers: [{ color: '#1B211A' }],
+  },
+  {
+    featureType: 'poi.park',
+    elementType: 'labels.text.fill',
+    stylers: [{ color: '#6E7A5F' }],
+  },
+
+  {
+    featureType: 'road',
+    elementType: 'geometry.fill',
+    stylers: [{ color: '#241F1B' }],
+  },
+  {
+    featureType: 'road',
+    elementType: 'geometry.stroke',
+    stylers: [{ color: '#141110' }],
+  },
+  {
+    featureType: 'road',
+    elementType: 'labels.text.fill',
+    stylers: [{ color: '#8A7C6B' }],
+  },
+  {
+    featureType: 'road.arterial',
+    elementType: 'geometry.fill',
+    stylers: [{ color: '#2A241F' }],
+  },
+  {
+    featureType: 'road.highway',
+    elementType: 'geometry.fill',
+    stylers: [{ color: '#37302A' }],
+  },
+  {
+    featureType: 'road.highway',
+    elementType: 'geometry.stroke',
+    stylers: [{ color: '#141110' }],
+  },
+  {
+    featureType: 'road.highway',
+    elementType: 'labels.text.fill',
+    stylers: [{ color: '#C3B7A6' }],
+  },
+  {
+    featureType: 'road.highway.controlled_access',
+    elementType: 'geometry.fill',
+    stylers: [{ color: '#463A31' }],
+  },
+  {
+    featureType: 'road.local',
+    elementType: 'geometry.fill',
+    stylers: [{ color: '#1F1A17' }],
+  },
+  {
+    featureType: 'road.local',
+    elementType: 'labels.text.fill',
+    stylers: [{ color: '#6E6154' }],
+  },
+
+  {
+    featureType: 'transit',
+    elementType: 'labels.text.fill',
+    stylers: [{ color: '#6E6154' }],
+  },
+  {
+    featureType: 'transit.line',
+    elementType: 'geometry',
+    stylers: [{ color: '#2A241F' }],
+  },
+  {
+    featureType: 'transit.station',
+    elementType: 'geometry',
+    stylers: [{ color: '#241F1B' }],
+  },
+  {
+    featureType: 'transit.station',
+    elementType: 'labels.text.fill',
+    stylers: [{ color: '#8A7C6B' }],
+  },
+
+  { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#0C0A09' }] },
+  {
+    featureType: 'water',
+    elementType: 'labels.text.fill',
+    stylers: [{ color: '#4A4038' }],
+  },
+  {
+    featureType: 'water',
+    elementType: 'labels.text.stroke',
+    stylers: [{ color: '#0C0A09' }],
+  },
 ]
 
 const staticMapOptions: google.maps.MapOptions = {
