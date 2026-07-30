@@ -54,12 +54,12 @@ const CLEAN_MAP_STYLES: google.maps.MapTypeStyle[] = [
   {
     featureType: 'landscape.man_made',
     elementType: 'geometry',
-    stylers: [{ color: '#1C1816' }],
+    stylers: [{ color: '#211C1A' }],
   },
   {
     featureType: 'landscape.natural',
     elementType: 'geometry',
-    stylers: [{ color: '#181413' }],
+    stylers: [{ color: '#1D1918' }],
   },
 
   { featureType: 'poi', elementType: 'geometry', stylers: [{ color: '#1F1A17' }] },
@@ -83,32 +83,32 @@ const CLEAN_MAP_STYLES: google.maps.MapTypeStyle[] = [
   {
     featureType: 'road',
     elementType: 'geometry.fill',
-    stylers: [{ color: '#241F1B' }],
+    stylers: [{ color: '#3A322B' }],
   },
   {
     featureType: 'road',
     elementType: 'geometry.stroke',
-    stylers: [{ color: '#141110' }],
+    stylers: [{ color: '#191514' }],
   },
   {
     featureType: 'road',
     elementType: 'labels.text.fill',
-    stylers: [{ color: '#8A7C6B' }],
+    stylers: [{ color: '#B3A594' }],
   },
   {
     featureType: 'road.arterial',
     elementType: 'geometry.fill',
-    stylers: [{ color: '#2A241F' }],
+    stylers: [{ color: '#463C33' }],
   },
   {
     featureType: 'road.highway',
     elementType: 'geometry.fill',
-    stylers: [{ color: '#37302A' }],
+    stylers: [{ color: '#5A4C40' }],
   },
   {
     featureType: 'road.highway',
     elementType: 'geometry.stroke',
-    stylers: [{ color: '#141110' }],
+    stylers: [{ color: '#1C1817' }],
   },
   {
     featureType: 'road.highway',
@@ -118,17 +118,17 @@ const CLEAN_MAP_STYLES: google.maps.MapTypeStyle[] = [
   {
     featureType: 'road.highway.controlled_access',
     elementType: 'geometry.fill',
-    stylers: [{ color: '#463A31' }],
+    stylers: [{ color: '#6B5A4B' }],
   },
   {
     featureType: 'road.local',
     elementType: 'geometry.fill',
-    stylers: [{ color: '#1F1A17' }],
+    stylers: [{ color: '#312A25' }],
   },
   {
     featureType: 'road.local',
     elementType: 'labels.text.fill',
-    stylers: [{ color: '#6E6154' }],
+    stylers: [{ color: '#8F8271' }],
   },
 
   {
@@ -139,7 +139,7 @@ const CLEAN_MAP_STYLES: google.maps.MapTypeStyle[] = [
   {
     featureType: 'transit.line',
     elementType: 'geometry',
-    stylers: [{ color: '#2A241F' }],
+    stylers: [{ color: '#3A322B' }],
   },
   {
     featureType: 'transit.station',
