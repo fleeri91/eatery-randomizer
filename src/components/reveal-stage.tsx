@@ -125,7 +125,7 @@ export function RevealStage({
 
     return (
       <div
-        className="relative w-full overflow-hidden rounded-3xl border border-border bg-card"
+        className="relative w-full overflow-hidden border border-border bg-card"
         style={{ height: WINDOW_HEIGHT }}
       >
         <div
@@ -140,7 +140,7 @@ export function RevealStage({
             return (
               <div
                 key={item.row}
-                className="relative flex items-center justify-center px-4 text-center font-heading text-lg font-extrabold text-foreground"
+                className="relative flex items-center justify-center px-4 text-center font-heading text-lg font-bold text-foreground"
                 style={{
                   height: ROW_HEIGHT,
                   opacity: landed && !isWinner ? 0.32 : 1,
@@ -162,7 +162,7 @@ export function RevealStage({
                 </span>
                 {isWinner && (
                   <span
-                    className="pointer-events-none absolute left-1/2 h-1 w-[46px] -translate-x-1/2 rounded-full bg-primary"
+                    className="pointer-events-none absolute left-1/2 h-1 w-[46px] -translate-x-1/2 bg-primary"
                     style={{ top: 44, animation: 'win-sweep 400ms ease 120ms both' }}
                   />
                 )}
@@ -171,7 +171,7 @@ export function RevealStage({
           })}
         </div>
         <div
-          className="pointer-events-none absolute left-2 right-2 rounded-2xl border-2 border-primary bg-primary/5"
+          className="pointer-events-none absolute left-2 right-2 border-2 border-primary bg-primary/5"
           style={{
             top: `calc(50% - ${ROW_HEIGHT / 2}px)`,
             height: ROW_HEIGHT,

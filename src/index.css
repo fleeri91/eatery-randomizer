@@ -1,14 +1,13 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
-@import '@fontsource-variable/hanken-grotesk';
-@import '@fontsource-variable/bricolage-grotesque';
+@import '@fontsource-variable/space-grotesk';
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-heading: 'Bricolage Grotesque Variable', sans-serif;
-  --font-sans: 'Hanken Grotesk Variable', sans-serif;
+  --font-heading: 'Space Grotesk Variable', sans-serif;
+  --font-sans: 'Space Grotesk Variable', sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -50,72 +49,38 @@
 }
 
 :root {
-  --background: oklch(0.95 0.02 70);
-  --foreground: oklch(0.28 0.06 38);
-  --card: oklch(0.99 0.01 70);
-  --card-foreground: oklch(0.28 0.06 38);
-  --popover: oklch(0.99 0.01 70);
-  --popover-foreground: oklch(0.28 0.06 38);
-  --primary: oklch(0.66 0.19 32);
-  --primary-foreground: oklch(0.99 0.02 70);
-  --secondary: oklch(0.95 0.05 60);
-  --secondary-foreground: oklch(0.66 0.19 32);
-  --muted: oklch(0.96 0.02 60);
-  --muted-foreground: oklch(0.56 0.04 50);
-  --accent: oklch(0.95 0.05 60);
-  --accent-foreground: oklch(0.66 0.19 32);
-  --destructive: oklch(0.58 0.2 25);
-  --border: oklch(0.88 0.02 60);
-  --input: oklch(0.88 0.02 60);
-  --ring: oklch(0.66 0.19 32 / 50%);
-  --chart-1: oklch(0.66 0.19 32);
-  --chart-2: oklch(0.6 0.11 160);
-  --chart-3: oklch(0.68 0.2 25);
-  --chart-4: oklch(0.56 0.04 50);
-  --chart-5: oklch(0.28 0.06 38);
-  --radius: 1rem;
-  --sidebar: oklch(0.98 0.02 70);
-  --sidebar-foreground: oklch(0.28 0.06 38);
-  --sidebar-primary: oklch(0.66 0.19 32);
-  --sidebar-primary-foreground: oklch(0.99 0.02 70);
-  --sidebar-accent: oklch(0.95 0.05 60);
-  --sidebar-accent-foreground: oklch(0.66 0.19 32);
-  --sidebar-border: oklch(0.88 0.02 60);
-  --sidebar-ring: oklch(0.66 0.19 32 / 50%);
-}
-
-.dark {
-  --background: oklch(0.22 0.03 40);
-  --foreground: oklch(0.95 0.02 70);
-  --card: oklch(0.27 0.035 40);
-  --card-foreground: oklch(0.95 0.02 70);
-  --popover: oklch(0.27 0.035 40);
-  --popover-foreground: oklch(0.95 0.02 70);
-  --primary: oklch(0.7 0.19 32);
-  --primary-foreground: oklch(0.16 0.03 40);
-  --secondary: oklch(0.33 0.045 45);
-  --secondary-foreground: oklch(0.9 0.05 60);
-  --muted: oklch(0.32 0.03 45);
-  --muted-foreground: oklch(0.72 0.04 55);
-  --accent: oklch(0.35 0.06 45);
-  --accent-foreground: oklch(0.9 0.05 60);
+  --background: #141110;
+  --foreground: #f0e7d8;
+  --card: #1c1816;
+  --card-foreground: #f0e7d8;
+  --popover: #1c1816;
+  --popover-foreground: #f0e7d8;
+  --primary: #ff5a1f;
+  --primary-foreground: #1c1816;
+  --secondary: #241f1b;
+  --secondary-foreground: #f0e7d8;
+  --muted: #1c1816;
+  --muted-foreground: #8a7c6b;
+  --accent: #241f1b;
+  --accent-foreground: #ff5a1f;
   --destructive: oklch(0.68 0.2 25);
-  --border: oklch(1 0.02 60 / 12%);
-  --input: oklch(1 0.02 60 / 15%);
-  --ring: oklch(0.7 0.19 32 / 50%);
-  --chart-1: oklch(0.7 0.19 32);
-  --chart-2: oklch(0.65 0.11 160);
-  --chart-3: oklch(0.72 0.2 25);
-  --chart-4: oklch(0.72 0.04 55);
-  --chart-5: oklch(0.95 0.02 70);
-  --sidebar: oklch(0.25 0.03 40);
-  --sidebar-foreground: oklch(0.95 0.02 70);
-  --sidebar-primary: oklch(0.7 0.19 32);
-  --sidebar-primary-foreground: oklch(0.16 0.03 40);
-  --sidebar-accent: oklch(0.35 0.06 45);
-  --sidebar-accent-foreground: oklch(0.9 0.05 60);
-  --sidebar-border: oklch(1 0.02 60 / 12%);
-  --sidebar-ring: oklch(0.7 0.19 32 / 50%);
+  --border: #37302a;
+  --input: #37302a;
+  --ring: rgb(255 90 31 / 50%);
+  --chart-1: #ff5a1f;
+  --chart-2: #8a7c6b;
+  --chart-3: #f0e7d8;
+  --chart-4: #37302a;
+  --chart-5: #c3b7a6;
+  --radius: 0rem;
+  --sidebar: #1c1816;
+  --sidebar-foreground: #f0e7d8;
+  --sidebar-primary: #ff5a1f;
+  --sidebar-primary-foreground: #1c1816;
+  --sidebar-accent: #241f1b;
+  --sidebar-accent-foreground: #ff5a1f;
+  --sidebar-border: #37302a;
+  --sidebar-ring: rgb(255 90 31 / 50%);
 }
 
 @layer base {
@@ -124,6 +89,11 @@
   }
   body {
     @apply bg-background text-foreground;
+    background-image: repeating-linear-gradient(
+      0deg,
+      rgb(255 255 255 / 2.2%) 0 1px,
+      transparent 1px 4px
+    );
   }
   html {
     @apply font-sans;

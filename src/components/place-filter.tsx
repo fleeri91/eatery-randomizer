@@ -1,7 +1,6 @@
 import { Label } from './ui/label'
-import { Slider } from './ui/slider'
 import { cn } from '@/lib/utils'
-import { useFilterStore, MAX_RADIUS_METERS } from '@/stores/filter-store'
+import { useFilterStore } from '@/stores/filter-store'
 import {
   CATEGORY_LABELS,
   CATEGORY_TYPES,
@@ -21,6 +20,22 @@ const RATING_OPTIONS: { value: number; label: string }[] = [
   { value: 4.5, label: '4.5+' },
 ]
 
+const DISTANCE_OPTIONS: { meters: number; label: string }[] = [
+  { meters: 500, label: '0.5 km' },
+  { meters: 1000, label: '1 km' },
+  { meters: 2000, label: '2 km' },
+  { meters: 3000, label: '3 km' },
+]
+
+const chipClass = (selected: boolean, disabled: boolean) =>
+  cn(
+    'border px-3.5 py-2 text-[11px] font-semibold tracking-[0.08em] uppercase transition-colors disabled:pointer-events-none',
+    disabled && 'opacity-50',
+    selected
+      ? 'border-primary bg-primary text-primary-foreground'
+      : 'border-border bg-card text-foreground/80 hover:bg-muted'
+  )
+
 export function PlaceFilters({ disabled = false }: PlaceFiltersProps) {
   const categories = Object.keys(CATEGORY_TYPES) as Category[]
   const value = useFilterStore((s) => s.filters)
@@ -30,9 +45,9 @@ export function PlaceFilters({ disabled = false }: PlaceFiltersProps) {
   const togglePriceLevel = useFilterStore((s) => s.togglePriceLevel)
 
   return (
-    <div className={cn('space-y-6', disabled && 'opacity-50')}>
+    <div className="space-y-6">
       <div className="space-y-2.5">
-        <Label className="text-xs font-semibold tracking-[0.12em] text-muted-foreground uppercase">
+        <Label className="text-[10px] font-semibold tracking-[0.24em] text-muted-foreground uppercase">
           Category
         </Label>
         <div className="flex flex-wrap gap-2">
@@ -44,12 +59,7 @@ export function PlaceFilters({ disabled = false }: PlaceFiltersProps) {
                 type="button"
                 disabled={disabled}
                 onClick={() => setCategory(c)}
-                className={cn(
-                  'rounded-full border px-3.5 py-2 text-sm font-semibold transition-colors disabled:pointer-events-none',
-                  selected
-                    ? 'border-primary bg-primary text-primary-foreground'
-                    : 'border-border bg-card text-foreground hover:bg-muted'
-                )}
+                className={chipClass(selected, disabled)}
               >
                 {CATEGORY_LABELS[c]}
               </button>
@@ -59,7 +69,7 @@ export function PlaceFilters({ disabled = false }: PlaceFiltersProps) {
       </div>
 
       <div className="space-y-2.5">
-        <Label className="text-xs font-semibold tracking-[0.12em] text-muted-foreground uppercase">
+        <Label className="text-[10px] font-semibold tracking-[0.24em] text-muted-foreground uppercase">
           Price
         </Label>
         <div className="flex gap-2">
@@ -71,12 +81,7 @@ export function PlaceFilters({ disabled = false }: PlaceFiltersProps) {
                 type="button"
                 disabled={disabled}
                 onClick={() => togglePriceLevel(level)}
-                className={cn(
-                  'flex-1 rounded-2xl border py-3 font-heading text-base font-bold transition-colors disabled:pointer-events-none',
-                  selected
-                    ? 'border-primary bg-primary text-primary-foreground'
-                    : 'border-border bg-card text-foreground hover:bg-muted'
-                )}
+                className={cn('flex-1', chipClass(selected, disabled))}
               >
                 {PRICE_LEVEL_LABELS[level]}
               </button>
@@ -91,8 +96,8 @@ export function PlaceFilters({ disabled = false }: PlaceFiltersProps) {
       </div>
 
       <div className="space-y-2.5">
-        <Label className="text-xs font-semibold tracking-[0.12em] text-muted-foreground uppercase">
-          Minimum rating
+        <Label className="text-[10px] font-semibold tracking-[0.24em] text-muted-foreground uppercase">
+          Rating
         </Label>
         <div className="flex gap-2">
           {RATING_OPTIONS.map((option) => {
@@ -103,12 +108,7 @@ export function PlaceFilters({ disabled = false }: PlaceFiltersProps) {
                 type="button"
                 disabled={disabled}
                 onClick={() => setMinRating(option.value)}
-                className={cn(
-                  'flex-1 rounded-2xl border py-3 font-heading text-base font-bold transition-colors disabled:pointer-events-none',
-                  selected
-                    ? 'border-primary bg-primary text-primary-foreground'
-                    : 'border-border bg-card text-foreground hover:bg-muted'
-                )}
+                className={cn('flex-1', chipClass(selected, disabled))}
               >
                 {option.label}
               </button>
@@ -118,29 +118,25 @@ export function PlaceFilters({ disabled = false }: PlaceFiltersProps) {
       </div>
 
       <div className="space-y-2.5">
-        <div className="flex items-baseline justify-between">
-          <Label
-            htmlFor="radius"
-            className="text-xs font-semibold tracking-[0.12em] text-muted-foreground uppercase"
-          >
-            Within
-          </Label>
-          <span className="font-heading text-base font-bold tabular-nums text-primary">
-            {(value.radiusMeters / 1000).toFixed(1)} km
-          </span>
+        <Label className="text-[10px] font-semibold tracking-[0.24em] text-muted-foreground uppercase">
+          Within
+        </Label>
+        <div className="flex gap-2">
+          {DISTANCE_OPTIONS.map((option) => {
+            const selected = value.radiusMeters === option.meters
+            return (
+              <button
+                key={option.meters}
+                type="button"
+                disabled={disabled}
+                onClick={() => setRadiusMeters(option.meters)}
+                className={cn('flex-1', chipClass(selected, disabled))}
+              >
+                {option.label}
+              </button>
+            )
+          })}
         </div>
-        <Slider
-          id="radius"
-          min={0}
-          max={MAX_RADIUS_METERS}
-          step={100}
-          value={[value.radiusMeters]}
-          disabled={disabled}
-          onValueChange={(val) => {
-            const radiusMeters = Array.isArray(val) ? val[0] : val
-            setRadiusMeters(radiusMeters)
-          }}
-        />
       </div>
     </div>
   )

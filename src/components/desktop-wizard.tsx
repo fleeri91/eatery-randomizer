@@ -47,7 +47,12 @@ function FiltersPanel({
   const locked = !location
 
   return (
-    <div className="flex w-[640px] max-w-full flex-col bg-card">
+    <div className="flex w-[640px] max-w-full flex-col border-r border-border bg-card">
+      <div className="border-b border-border px-6 py-4">
+        <p className="font-heading text-2xl font-bold tracking-tight text-primary">
+          WHIM
+        </p>
+      </div>
       <div className="relative flex-1 overflow-y-auto px-6 py-5">
         <div
           style={
@@ -65,22 +70,20 @@ function FiltersPanel({
         {locked && (
           <div
             className="absolute inset-0 flex flex-col items-center justify-center px-10 text-center backdrop-blur-sm"
-            style={{ background: 'oklch(0.985 0.015 70 / 0.75)' }}
+            style={{ background: 'rgb(28 24 22 / 90%)' }}
           >
-            <div className="mb-4 flex size-14 items-center justify-center rounded-full bg-secondary">
-              <span className="size-5 shrink-0 rotate-[-45deg] rounded-[50%_50%_50%_0] bg-primary" />
-            </div>
-            <p className="font-heading text-xl font-extrabold tracking-tight text-foreground">
+            <div className="mb-4 size-14 rotate-45 border border-primary" />
+            <p className="font-heading text-xl font-bold tracking-tight text-foreground">
               Where are you?
             </p>
-            <p className="mt-2 max-w-[240px] text-sm text-muted-foreground">
+            <p className="mt-2 max-w-60 text-sm text-muted-foreground">
               Whim needs a place to search before you can set the rest. Pick a
               location to unlock the filters.
             </p>
             <button
               type="button"
               onClick={onOpenLocation}
-              className="mt-5 rounded-2xl bg-primary px-6 py-3.5 font-heading text-base font-bold text-primary-foreground shadow-[0_10px_24px_-6px_oklch(0.66_0.19_32/0.5)]"
+              className="mt-5 bg-primary px-6 py-3.5 font-heading text-sm font-bold tracking-wide text-primary-foreground uppercase"
             >
               Choose a location
             </button>
@@ -93,9 +96,9 @@ function FiltersPanel({
           <button
             type="button"
             onClick={onSubmit}
-            className="w-full rounded-2xl bg-primary py-4 font-heading text-lg font-bold text-primary-foreground shadow-[0_10px_24px_-6px_oklch(0.66_0.19_32/0.5)]"
+            className="w-full bg-primary py-4 font-heading text-lg font-bold tracking-[0.04em] text-primary-foreground uppercase"
           >
-            Shuffle the block
+            Pick for me
           </button>
           <p className="mt-2.5 text-center text-xs text-muted-foreground">
             Whim picks one at random from what fits.
@@ -151,7 +154,7 @@ export function DesktopWizard({
           <button
             type="button"
             onClick={onBackToFilters}
-            className="absolute top-6 left-6 z-10 flex items-center gap-1.5 rounded-full border border-border bg-card px-3.5 py-2 text-sm font-semibold text-foreground/80 shadow-sm transition-colors hover:bg-muted"
+            className="absolute top-6 left-6 z-10 flex items-center gap-1.5 border border-border bg-card px-3.5 py-2 text-sm font-semibold text-foreground/80 transition-colors hover:bg-muted"
           >
             <ChevronLeft className="size-3.5" /> Back
           </button>
@@ -165,13 +168,7 @@ export function DesktopWizard({
         )}
 
         {submitted && (
-          <div
-            className="flex flex-1 flex-col items-center justify-center p-10"
-            style={{
-              background:
-                'radial-gradient(circle at 50% 32%, oklch(0.99 0.02 72), oklch(0.965 0.025 65))',
-            }}
-          >
+          <div className="flex flex-1 flex-col items-center justify-center bg-background p-10">
             {searching && (
               <p className="animate-pulse font-heading text-lg font-semibold text-muted-foreground">
                 Scouting the area…
@@ -208,11 +205,11 @@ export function DesktopWizard({
             {!searching && !placesError && poolSize > 0 && (
               <>
                 {(revealPhase === 'cycling' || revealPhase === 'landed') && (
-                  <p className="mb-6 font-heading text-2xl font-extrabold tracking-tight text-foreground">
-                    Letting chance decide…
+                  <p className="mb-6 font-heading text-xs font-semibold tracking-[0.24em] text-muted-foreground uppercase">
+                    Consulting the whim…
                   </p>
                 )}
-                <div className="w-[460px] max-w-full">
+                <div className="w-[620px] max-w-full">
                   <RevealStage
                     revealKey={current?.id ?? null}
                     candidateLabels={eligible.map((p) => p.name)}

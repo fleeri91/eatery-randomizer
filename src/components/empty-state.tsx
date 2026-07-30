@@ -36,7 +36,7 @@ function SuggestionButton({
     <button
       type="button"
       onClick={onClick}
-      className="flex w-full items-center justify-between gap-2.5 rounded-2xl border border-border bg-card px-4 py-3.5 text-left transition-colors hover:bg-muted"
+      className="flex w-full items-center justify-between gap-2.5 border border-border bg-card px-4 py-3.5 text-left transition-colors hover:bg-muted"
     >
       <span className="flex items-center gap-2.5 text-sm font-semibold text-foreground">
         {icon}
@@ -75,16 +75,11 @@ export function EmptyState({
 
   return (
     <div className="flex w-full flex-1 flex-col items-center justify-center px-4 py-10 text-center sm:flex-none">
-      <div className="relative mb-6 size-24">
-        <div className="absolute inset-0 rounded-full bg-secondary" />
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="size-7 rotate-[-45deg] rounded-[50%_50%_50%_0] bg-primary/40" />
-        </div>
-        <div className="absolute inset-0 rounded-full border-[3px] border-primary" />
-        <div className="absolute top-1/2 left-1/2 h-[3px] w-[124px] -translate-x-1/2 -translate-y-1/2 rotate-45 rounded-full bg-primary" />
+      <div className="relative mb-6 flex size-16 items-center justify-center border border-primary">
+        <span className="size-6 rotate-45 border border-primary" />
       </div>
 
-      <h2 className="font-heading text-2xl leading-tight font-extrabold tracking-tight text-foreground">
+      <h2 className="font-heading text-2xl leading-tight font-bold tracking-tight text-foreground">
         Nothing fits — yet
       </h2>
       <p className="mt-2.5 max-w-[280px] text-sm leading-relaxed text-muted-foreground">
@@ -121,7 +116,7 @@ export function EmptyState({
         <button
           type="button"
           onClick={onBackToFilters}
-          className="w-full rounded-2xl bg-primary py-3.5 font-heading text-base font-bold text-primary-foreground shadow-[0_10px_24px_-6px_oklch(0.66_0.19_32/0.5)]"
+          className="w-full bg-primary py-3.5 font-heading text-sm font-bold tracking-wide text-primary-foreground uppercase"
         >
           Back to filters
         </button>

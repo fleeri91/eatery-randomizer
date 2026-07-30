@@ -99,11 +99,11 @@ export function LocationSheet({
         className="fixed inset-0 z-40 bg-foreground/40"
       />
       <div
-        className="fixed inset-x-0 bottom-0 z-50 mx-auto flex max-h-[85vh] w-full max-w-sm flex-col rounded-t-[28px] border-t border-border bg-card px-5 pt-3.5 pb-6 shadow-[0_-24px_48px_oklch(0.3_0.05_40/0.28)] sm:bottom-6 sm:rounded-b-[28px]"
+        className="fixed inset-x-0 bottom-0 z-50 mx-auto flex max-h-[85vh] w-full max-w-sm flex-col border-t border-border bg-card px-5 pt-3.5 pb-6 sm:bottom-6 sm:border"
         style={{ animation: 'sheet-in 420ms cubic-bezier(0.2, 0.8, 0.2, 1)' }}
       >
-        <div className="mx-auto mb-4 h-1.5 w-10 shrink-0 rounded-full bg-border" />
-        <h2 className="mb-3 font-heading text-xl font-extrabold tracking-tight text-foreground">
+        <div className="mx-auto mb-4 h-1 w-10 shrink-0 bg-border" />
+        <h2 className="mb-3 font-heading text-xl font-bold tracking-tight text-foreground">
           Where to?
         </h2>
 
@@ -112,13 +112,13 @@ export function LocationSheet({
           onClick={handleUseCurrentLocation}
           disabled={locating}
           className={cn(
-            'mb-3 flex w-full shrink-0 items-center gap-3 rounded-2xl border px-4 py-3.5 text-left transition-colors disabled:opacity-60',
+            'mb-3 flex w-full shrink-0 items-center gap-3 border px-4 py-3.5 text-left transition-colors disabled:opacity-60',
             usingHere
               ? 'border-primary bg-secondary'
               : 'border-border bg-background hover:bg-muted'
           )}
         >
-          <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+          <span className="flex size-9 shrink-0 items-center justify-center bg-primary text-primary-foreground">
             {locating ? (
               <LoaderCircle className="size-4 animate-spin" />
             ) : (
@@ -149,13 +149,13 @@ export function LocationSheet({
 
         <div className="my-1 flex shrink-0 items-center gap-2.5">
           <div className="h-px flex-1 bg-border" />
-          <span className="text-[11px] font-semibold tracking-[0.1em] text-muted-foreground uppercase">
+          <span className="text-[10px] font-semibold tracking-[0.2em] text-muted-foreground uppercase">
             or search a place
           </span>
           <div className="h-px flex-1 bg-border" />
         </div>
 
-        <div className="mt-2 flex shrink-0 items-center gap-2.5 rounded-2xl border border-border bg-background px-3.5 py-3">
+        <div className="mt-2 flex shrink-0 items-center gap-2.5 border border-border bg-background px-3.5 py-3">
           <Search className="size-4 shrink-0 text-muted-foreground" />
           <Input
             autoFocus
@@ -195,8 +195,8 @@ export function LocationSheet({
                   selected && 'bg-secondary/60'
                 )}
               >
-                <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-secondary">
-                  <span className="size-2.5 shrink-0 rotate-[-45deg] rounded-[50%_50%_50%_0] bg-primary" />
+                <span className="flex size-7 shrink-0 items-center justify-center bg-secondary">
+                  <span className="size-2.5 shrink-0 rounded-full bg-primary" />
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-[15px] font-bold text-foreground">

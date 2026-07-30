@@ -96,15 +96,15 @@ export default function App() {
               type="button"
               aria-label="Back to filters"
               onClick={() => setSubmitted(false)}
-              className="flex size-9 shrink-0 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-muted"
+              className="flex size-9 shrink-0 items-center justify-center border border-border bg-card text-foreground transition-colors hover:bg-muted"
             >
               <ChevronLeft className="size-5" />
             </button>
             <div className="min-w-0">
-              <p className="font-heading text-base leading-tight font-extrabold text-foreground">
-                Whim
+              <p className="font-heading text-base leading-tight font-bold text-primary">
+                WHIM
               </p>
-              <p className="truncate text-xs text-muted-foreground">
+              <p className="truncate text-[11px] tracking-wide text-muted-foreground uppercase">
                 {CATEGORY_LABELS[filters.category]} · within{' '}
                 {(filters.radiusMeters / 1000).toFixed(1)} km · {poolSize} place
                 {poolSize === 1 ? '' : 's'}
