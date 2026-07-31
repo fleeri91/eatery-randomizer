@@ -31,7 +31,13 @@ export async function searchPlaces({
   location,
   category,
   radiusMeters = 3000,
+  subtypes,
 }: SearchPlacesParams): Promise<Place[]> {
+  const includedTypes =
+    subtypes && subtypes.size > 0
+      ? [...subtypes]
+      : [CATEGORY_TYPES[category]]
+
   const res = await fetch(
     'https://places.googleapis.com/v1/places:searchNearby',
     {
@@ -42,7 +48,7 @@ export async function searchPlaces({
         'X-Goog-FieldMask': FIELD_MASK,
       },
       body: JSON.stringify({
-        includedTypes: [CATEGORY_TYPES[category]],
+        includedTypes,
         maxResultCount: 20,
         locationRestriction: {
           circle: {

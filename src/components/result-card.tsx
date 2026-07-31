@@ -2,7 +2,12 @@ import { createPortal } from 'react-dom'
 import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api'
 import { ChevronLeft } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
-import { directionsLink, placeInfoLink, PRICE_SYMBOLS } from '@/lib/place-links'
+import {
+  directionsLink,
+  distanceLabel,
+  placeInfoLink,
+  PRICE_SYMBOLS,
+} from '@/lib/place-links'
 import {
   CATEGORY_LABELS,
   type Coordinates,
@@ -254,7 +259,7 @@ export function ResultCard({
           {place.name}
         </h2>
         <p className="mt-2.5 text-sm text-muted-foreground">
-          {place.address}
+          {CATEGORY_LABELS[category]} · {place.address}
         </p>
 
         {place.rating === null && (
@@ -274,10 +279,10 @@ export function ResultCard({
           </div>
           <div className="flex-1 border-r border-border p-3">
             <div className="text-[9px] font-semibold tracking-[0.2em] text-muted-foreground uppercase">
-              Category
+              Away
             </div>
             <div className="mt-1 font-heading text-2xl font-bold text-foreground">
-              {CATEGORY_LABELS[category]}
+              {distanceLabel(origin, place.location) ?? '—'}
             </div>
           </div>
           <div className="flex-1 p-3">

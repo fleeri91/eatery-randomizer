@@ -1,5 +1,9 @@
+import { useState } from 'react'
+import { ChevronRight } from 'lucide-react'
 import { Label } from './ui/label'
+import { CuisinePicker } from './cuisine-picker'
 import { cn } from '@/lib/utils'
+import { chipClass } from '@/lib/chip-styles'
 import { useFilterStore } from '@/stores/filter-store'
 import {
   CATEGORY_LABELS,
@@ -27,14 +31,6 @@ const DISTANCE_OPTIONS: { meters: number; label: string }[] = [
   { meters: 3000, label: '3 km' },
 ]
 
-const chipClass = (selected: boolean, disabled: boolean) =>
-  cn(
-    'border px-3.5 py-2 text-[11px] font-semibold tracking-[0.08em] uppercase transition-colors disabled:pointer-events-none',
-    disabled && 'opacity-50',
-    selected
-      ? 'border-primary bg-primary text-primary-foreground'
-      : 'border-border bg-card text-foreground/80 hover:bg-muted'
-  )
 
 export function PlaceFilters({ disabled = false }: PlaceFiltersProps) {
   const categories = Object.keys(CATEGORY_TYPES) as Category[]
@@ -43,6 +39,11 @@ export function PlaceFilters({ disabled = false }: PlaceFiltersProps) {
   const setMinRating = useFilterStore((s) => s.setMinRating)
   const setRadiusMeters = useFilterStore((s) => s.setRadiusMeters)
   const togglePriceLevel = useFilterStore((s) => s.togglePriceLevel)
+  const [cuisineOpen, setCuisineOpen] = useState(false)
+
+  const cuisineLabel = value.subtypes.size
+    ? `${value.subtypes.size} selected`
+    : `Any ${CATEGORY_LABELS[value.category].toLowerCase()}`
 
   return (
     <div className="space-y-6">
@@ -66,6 +67,31 @@ export function PlaceFilters({ disabled = false }: PlaceFiltersProps) {
             )
           })}
         </div>
+
+        <button
+          type="button"
+          disabled={disabled}
+          onClick={() => setCuisineOpen(true)}
+          className={cn(
+            'flex w-full items-center justify-between gap-3 border border-border bg-card px-3.5 py-3 text-left transition-colors hover:border-primary disabled:pointer-events-none',
+            disabled && 'opacity-50'
+          )}
+        >
+          <span className="text-[9px] font-semibold tracking-[0.22em] text-muted-foreground uppercase">
+            Cuisine
+          </span>
+          <span className="flex min-w-0 items-center gap-1.5 text-[13px] font-semibold text-foreground">
+            <span className="truncate">{cuisineLabel}</span>
+            <ChevronRight className="size-3.5 shrink-0 text-primary" />
+          </span>
+        </button>
+
+        <CuisinePicker
+          key={value.category}
+          open={cuisineOpen}
+          onOpenChange={setCuisineOpen}
+          category={value.category}
+        />
       </div>
 
       <div className="space-y-2.5">

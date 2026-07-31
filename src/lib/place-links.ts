@@ -35,6 +35,33 @@ export function directionsLink(
   return url.toString()
 }
 
+const EARTH_RADIUS_KM = 6371
+
+/** Straight-line (haversine) distance between two coordinates, in km. */
+function haversineKm(a: Coordinates, b: Coordinates): number {
+  const dLat = ((b.lat - a.lat) * Math.PI) / 180
+  const dLng = ((b.lng - a.lng) * Math.PI) / 180
+  const lat1 = (a.lat * Math.PI) / 180
+  const lat2 = (b.lat * Math.PI) / 180
+
+  const sinDLat = Math.sin(dLat / 2)
+  const sinDLng = Math.sin(dLng / 2)
+  const h =
+    sinDLat * sinDLat + Math.cos(lat1) * Math.cos(lat2) * sinDLng * sinDLng
+
+  return EARTH_RADIUS_KM * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h))
+}
+
+/** "450 m" under a kilometer, otherwise "1.2 km". Null without an origin. */
+export function distanceLabel(
+  origin: Coordinates | null,
+  point: Coordinates
+): string | null {
+  if (!origin) return null
+  const km = haversineKm(origin, point)
+  return km < 1 ? `${Math.round(km * 1000)} m` : `${km.toFixed(1)} km`
+}
+
 export function placeInfoLink(place: Place): string {
   // If you have a Google Place ID, this opens the exact place details page:
   if (place.id) {

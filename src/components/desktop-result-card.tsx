@@ -1,5 +1,5 @@
 import { Badge } from '@/components/ui/badge'
-import { directionsLink, PRICE_SYMBOLS } from '@/lib/place-links'
+import { directionsLink, distanceLabel, PRICE_SYMBOLS } from '@/lib/place-links'
 import {
   CATEGORY_LABELS,
   type Coordinates,
@@ -53,6 +53,14 @@ export function DesktopResultCard({
             </div>
             <div className="mt-2 font-heading text-[28px] leading-none font-bold text-foreground">
               {place.rating !== null ? place.rating.toFixed(1) : '—'}
+            </div>
+          </div>
+          <div className="flex-1 border-r border-border py-4 pl-6">
+            <div className="text-[9px] font-semibold tracking-[0.2em] text-muted-foreground uppercase">
+              Away
+            </div>
+            <div className="mt-2 font-heading text-[28px] leading-none font-bold text-foreground">
+              {distanceLabel(origin, place.location) ?? '—'}
             </div>
           </div>
           <div className="flex-1 py-4 pl-6">
