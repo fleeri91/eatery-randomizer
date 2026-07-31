@@ -62,6 +62,14 @@ export function distanceLabel(
   return km < 1 ? `${Math.round(km * 1000)} m` : `${km.toFixed(1)} km`
 }
 
+/** "$$ · 0.4 km" style subtext for a place, e.g. under a reveal candidate. */
+export function placeMeta(place: Place, origin: Coordinates | null): string {
+  const price = place.priceLevel ? PRICE_SYMBOLS[place.priceLevel] : null
+  return [price, distanceLabel(origin, place.location)]
+    .filter(Boolean)
+    .join(' · ')
+}
+
 export function placeInfoLink(place: Place): string {
   // If you have a Google Place ID, this opens the exact place details page:
   if (place.id) {

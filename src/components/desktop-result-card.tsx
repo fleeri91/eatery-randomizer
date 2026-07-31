@@ -25,9 +25,15 @@ export function DesktopResultCard({
   const price = place.priceLevel ? PRICE_SYMBOLS[place.priceLevel] : ''
 
   return (
-    <div className="w-full border border-border bg-card">
+    <div
+      className="w-full border border-border bg-card"
+      style={{ animation: 'reveal-in 500ms cubic-bezier(0.16, 0.84, 0.28, 1)' }}
+    >
       <div className="flex items-center justify-between border-b border-border px-7 py-3">
-        <p className="text-[10px] font-semibold tracking-[0.2em] text-primary uppercase">
+        <p
+          className="text-[10px] font-semibold tracking-[0.2em] text-primary uppercase"
+          style={{ animation: 'fade-in 300ms ease-out' }}
+        >
           Tonight, it's
         </p>
         <p className="text-[10px] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
@@ -35,7 +41,13 @@ export function DesktopResultCard({
         </p>
       </div>
       <div className="px-8 pt-8 pb-8">
-        <h2 className="font-heading text-[52px] leading-none font-bold tracking-tight text-foreground">
+        <h2
+          className="font-heading text-[52px] leading-none font-bold tracking-tight text-foreground"
+          style={{
+            animation:
+              'reveal-rise 600ms 60ms cubic-bezier(0.16, 0.84, 0.28, 1) both',
+          }}
+        >
           {place.name}
         </h2>
         <p className="mt-3 text-sm text-muted-foreground">{place.address}</p>
@@ -46,7 +58,13 @@ export function DesktopResultCard({
           </Badge>
         )}
 
-        <div className="mt-7 flex border-t border-b border-border">
+        <div
+          className="mt-7 flex border-t border-b border-border"
+          style={{
+            animation:
+              'reveal-rise 500ms 180ms cubic-bezier(0.16, 0.84, 0.28, 1) both',
+          }}
+        >
           <div className="flex-1 border-r border-border py-4">
             <div className="text-[9px] font-semibold tracking-[0.2em] text-muted-foreground uppercase">
               Rating

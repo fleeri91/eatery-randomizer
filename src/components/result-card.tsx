@@ -216,13 +216,13 @@ export function ResultCard({
   const price = place.priceLevel ? PRICE_SYMBOLS[place.priceLevel] : ''
 
   // Rendered via a portal (rather than in RevealStage's normal flow) so this
-  // full-screen takeover isn't clipped by an ancestor's `sheet-up` transform
+  // full-screen takeover isn't clipped by an ancestor's `reveal-in` transform
   // — a transformed ancestor would otherwise become the containing block for
   // `fixed`, breaking the viewport-relative layout.
   return createPortal(
     <div
       className="fixed inset-0 z-30 flex flex-col bg-background"
-      style={{ animation: 'sheet-up 500ms cubic-bezier(0.2, 0.8, 0.2, 1)' }}
+      style={{ animation: 'reveal-in 500ms cubic-bezier(0.16, 0.84, 0.28, 1)' }}
     >
       <div className="relative h-[260px] shrink-0 overflow-hidden border-b border-border bg-muted">
         {/* Clickable link wrapping the static map */}
@@ -239,7 +239,10 @@ export function ResultCard({
           </div>
         </a>
 
-        <div className="absolute bottom-0 left-0 bg-primary px-3 py-1.5 text-[10px] font-semibold tracking-[0.2em] text-primary-foreground uppercase">
+        <div
+          className="absolute bottom-0 left-0 bg-primary px-3 py-1.5 text-[10px] font-semibold tracking-[0.2em] text-primary-foreground uppercase"
+          style={{ animation: 'fade-in 300ms ease-out' }}
+        >
           Tonight, it's
         </div>
 
@@ -255,7 +258,13 @@ export function ResultCard({
       </div>
 
       <div className="flex-1 overflow-y-auto px-6 py-5">
-        <h2 className="font-heading text-[38px] leading-[1.0] font-bold tracking-tight text-foreground">
+        <h2
+          className="font-heading text-[38px] leading-[1.0] font-bold tracking-tight text-foreground"
+          style={{
+            animation:
+              'reveal-rise 550ms 60ms cubic-bezier(0.16, 0.84, 0.28, 1) both',
+          }}
+        >
           {place.name}
         </h2>
         <p className="mt-2.5 text-sm text-muted-foreground">
@@ -268,7 +277,13 @@ export function ResultCard({
           </Badge>
         )}
 
-        <div className="mt-5 flex border border-border">
+        <div
+          className="mt-5 flex border border-border"
+          style={{
+            animation:
+              'reveal-rise 500ms 180ms cubic-bezier(0.16, 0.84, 0.28, 1) both',
+          }}
+        >
           <div className="flex-1 border-r border-border p-3">
             <div className="text-[9px] font-semibold tracking-[0.2em] text-muted-foreground uppercase">
               Rating

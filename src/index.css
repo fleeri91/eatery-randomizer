@@ -100,14 +100,52 @@
   }
 }
 
-@keyframes sheet-up {
+@keyframes reveal-in {
   from {
     opacity: 0;
-    transform: translateY(24px);
+    transform: translateY(26px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes reveal-rise {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes tick-in {
+  from {
+    opacity: 0;
+    /* Fixed offset rather than a percentage — a percentage is relative to
+       this element's own (sometimes multi-line) box, so a long wrapped
+       name would travel far enough to sweep visually through the meta
+       line sitting below it. */
+    transform: translateY(14px);
+  }
+  60% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 
@@ -149,41 +187,3 @@
   }
 }
 
-@keyframes win-stamp {
-  0% {
-    transform: scale(1.14);
-    opacity: 0.4;
-  }
-  55% {
-    transform: scale(0.97);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-@keyframes win-sweep {
-  from {
-    transform: scaleX(0);
-  }
-  to {
-    transform: scaleX(1);
-  }
-}
-
-@keyframes frame-pop {
-  0% {
-    transform: scale(1);
-  }
-  35% {
-    transform: scale(1.045);
-  }
-  70% {
-    transform: scale(0.988);
-  }
-  100% {
-    transform: scale(1);
-  }
-}

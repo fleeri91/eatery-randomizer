@@ -5,6 +5,7 @@ import { LocationSheet } from '@/components/location-sheet'
 import { RevealStage } from '@/components/reveal-stage'
 import { DesktopResultCard } from '@/components/desktop-result-card'
 import { EmptyState } from '@/components/empty-state'
+import { placeMeta } from '@/lib/place-links'
 import { useFilterStore } from '@/stores/filter-store'
 import {
   type Category,
@@ -135,9 +136,6 @@ export function DesktopWizard({
   const location = useFilterStore((s) => s.location)
   const setLocation = useFilterStore((s) => s.setLocation)
   const [locOpen, setLocOpen] = useState(false)
-  const [revealPhase, setRevealPhase] = useState<
-    'idle' | 'cycling' | 'landed' | 'settled'
-  >('idle')
   const unlockTimeout = useRef<number | undefined>(undefined)
 
   useEffect(() => () => window.clearTimeout(unlockTimeout.current), [])
@@ -203,31 +201,27 @@ export function DesktopWizard({
             )}
 
             {!searching && !placesError && poolSize > 0 && (
-              <>
-                {(revealPhase === 'cycling' || revealPhase === 'landed') && (
-                  <p className="mb-6 font-heading text-xs font-semibold tracking-[0.24em] text-muted-foreground uppercase">
-                    Consulting the whim…
-                  </p>
-                )}
-                <div className="w-[620px] max-w-full">
-                  <RevealStage
-                    revealKey={current?.id ?? null}
-                    candidateLabels={eligible.map((p) => p.name)}
-                    targetLabel={current?.name ?? null}
-                    onPhaseChange={setRevealPhase}
-                  >
-                    {current && (
-                      <DesktopResultCard
-                        place={current}
-                        category={category}
-                        origin={location}
-                        onReroll={onReroll}
-                        onBlock={onBlock}
-                      />
-                    )}
-                  </RevealStage>
-                </div>
-              </>
+              <div className="w-[620px] max-w-full">
+                <RevealStage
+                  revealKey={current?.id ?? null}
+                  candidates={eligible.map((p) => ({
+                    label: p.name,
+                    meta: placeMeta(p, location),
+                  }))}
+                  targetLabel={current?.name ?? null}
+                  poolLabel={`${poolSize} place${poolSize === 1 ? '' : 's'} in play`}
+                >
+                  {current && (
+                    <DesktopResultCard
+                      place={current}
+                      category={category}
+                      origin={location}
+                      onReroll={onReroll}
+                      onBlock={onBlock}
+                    />
+                  )}
+                </RevealStage>
+              </div>
             )}
           </div>
         )}

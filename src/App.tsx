@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { ChevronLeft } from 'lucide-react'
 import { StartScreen } from './views/start-screen'
 import { useNearbyPlaces } from './lib/queries'
+import { placeMeta } from './lib/place-links'
 import { CATEGORY_LABELS } from './types/google-places'
 import { useRandomizer } from './hooks/use-randomizer'
 import { useMediaQuery } from './hooks/use-media-query'
@@ -139,8 +140,12 @@ export default function App() {
               <div className="flex flex-1 flex-col justify-center px-4 py-4 sm:contents">
                 <RevealStage
                   revealKey={current?.id ?? null}
-                  candidateLabels={eligible.map((p) => p.name)}
+                  candidates={eligible.map((p) => ({
+                    label: p.name,
+                    meta: placeMeta(p, location),
+                  }))}
                   targetLabel={current?.name ?? null}
+                  poolLabel={`${poolSize} place${poolSize === 1 ? '' : 's'} in play`}
                 >
                   {current && (
                     <ResultCard
