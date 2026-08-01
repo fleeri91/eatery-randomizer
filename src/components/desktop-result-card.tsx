@@ -11,6 +11,7 @@ interface DesktopResultCardProps {
   place: Place
   category: Category
   origin: Coordinates | null
+  passedOn: Place[]
   onReroll: () => void
   onBlock: (id: string) => void
 }
@@ -19,6 +20,7 @@ export function DesktopResultCard({
   place,
   category,
   origin,
+  passedOn,
   onReroll,
   onBlock,
 }: DesktopResultCardProps) {
@@ -90,6 +92,17 @@ export function DesktopResultCard({
             </div>
           </div>
         </div>
+
+        {passedOn.length > 0 && (
+          <p className="mt-5 text-xs leading-relaxed text-muted-foreground/70">
+            <span className="mr-1.5 font-semibold tracking-[0.14em] uppercase">
+              Passed on
+            </span>
+            <span className="line-through">
+              {passedOn.map((p) => p.name).join(', ')}
+            </span>
+          </p>
+        )}
 
         <div className="mt-7 flex items-center gap-3">
           <a

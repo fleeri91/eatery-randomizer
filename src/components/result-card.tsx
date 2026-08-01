@@ -19,6 +19,7 @@ interface ResultCardProps {
   place: Place
   category: Category
   origin: Coordinates | null
+  passedOn: Place[]
   onReroll: () => void
   onBlock: (id: string) => void
   onBack: () => void
@@ -209,6 +210,7 @@ export function ResultCard({
   place,
   category,
   origin,
+  passedOn,
   onReroll,
   onBlock,
   onBack,
@@ -313,6 +315,17 @@ export function ResultCard({
         {place.userRatingCount !== null && place.rating !== null && (
           <p className="mt-2.5 text-xs text-muted-foreground">
             {place.userRatingCount} ratings
+          </p>
+        )}
+
+        {passedOn.length > 0 && (
+          <p className="mt-4 text-xs leading-relaxed text-muted-foreground/70">
+            <span className="mr-1.5 font-semibold tracking-[0.14em] uppercase">
+              Passed on
+            </span>
+            <span className="line-through">
+              {passedOn.map((p) => p.name).join(', ')}
+            </span>
           </p>
         )}
       </div>
