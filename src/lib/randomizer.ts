@@ -1,4 +1,15 @@
-import { type Place, type PriceLevel } from '@/types/google-places'
+import { type Coordinates, type Place, type PriceLevel } from '@/types/google-places'
+import { haversineKm } from './place-links'
+
+export function filterByDistance(
+  places: Place[],
+  origin: Coordinates,
+  radiusMeters: number
+): Place[] {
+  return places.filter(
+    (p) => haversineKm(origin, p.location) * 1000 <= radiusMeters
+  )
+}
 
 export function filterByRating(places: Place[], minRating: number): Place[] {
   if (minRating <= 0) return places

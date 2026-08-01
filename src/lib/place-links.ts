@@ -38,7 +38,7 @@ export function directionsLink(
 const EARTH_RADIUS_KM = 6371
 
 /** Straight-line (haversine) distance between two coordinates, in km. */
-function haversineKm(a: Coordinates, b: Coordinates): number {
+export function haversineKm(a: Coordinates, b: Coordinates): number {
   const dLat = ((b.lat - a.lat) * Math.PI) / 180
   const dLng = ((b.lng - a.lng) * Math.PI) / 180
   const lat1 = (a.lat * Math.PI) / 180

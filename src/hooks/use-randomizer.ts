@@ -1,9 +1,16 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { type Place, type PriceLevel } from '@/types/google-places'
-import { filterByPrice, filterByRating, pickRandom } from '@/lib/randomizer'
+import { type Coordinates, type Place, type PriceLevel } from '@/types/google-places'
+import {
+  filterByDistance,
+  filterByPrice,
+  filterByRating,
+  pickRandom,
+} from '@/lib/randomizer'
 
 export function useRandomizer(
   places: Place[] | undefined,
+  origin: Coordinates | null,
+  radiusMeters: number,
   minRating: number,
   priceLevels: ReadonlySet<PriceLevel>
 ) {
@@ -13,10 +20,13 @@ export function useRandomizer(
   const [drawCount, setDrawCount] = useState(0)
 
   const eligible = useMemo(() => {
-    const rated = filterByRating(places ?? [], minRating)
+    const nearby = origin
+      ? filterByDistance(places ?? [], origin, radiusMeters)
+      : (places ?? [])
+    const rated = filterByRating(nearby, minRating)
     const priced = filterByPrice(rated, priceLevels)
     return priced.filter((p) => !blockedIds.has(p.id))
-  }, [places, minRating, priceLevels, blockedIds])
+  }, [places, origin, radiusMeters, minRating, priceLevels, blockedIds])
 
   useEffect(() => {
     setSeenIds(new Set())

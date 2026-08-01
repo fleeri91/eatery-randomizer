@@ -30,12 +30,13 @@ export default function App() {
   } = useNearbyPlaces(
     submitted ? (location ?? undefined) : undefined,
     filters.category,
-    filters.radiusMeters,
     filters.subtypes
   )
 
   const { current, randomize, block, poolSize, eligible } = useRandomizer(
     places,
+    location,
+    filters.radiusMeters,
     filters.minRating,
     filters.priceLevels
   )

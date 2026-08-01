@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { Check, LoaderCircle, LocateFixed, Search } from 'lucide-react'
 import { Input } from '@/components/ui/input'
-import { autocompleteCities, getPlaceLocation } from '@/lib/api'
+import { placeLocationQueryOptions, useCityAutocomplete } from '@/lib/queries'
 import { getCurrentPosition } from '@/lib/geo-location'
 import { cn } from '@/lib/utils'
 import { useFilterStore } from '@/stores/filter-store'
@@ -20,55 +21,44 @@ export function LocationSheet({
 }: LocationSheetProps) {
   const currentLabel = useFilterStore((s) => s.locationLabel)
   const usingHere = currentLabel === 'Near me'
+  const queryClient = useQueryClient()
 
   const [query, setQuery] = useState('')
-  const [suggestions, setSuggestions] = useState<PlaceSuggestion[]>([])
-  const [searching, setSearching] = useState(false)
+  const [debouncedQuery, setDebouncedQuery] = useState('')
   const [locating, setLocating] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const sessionToken = useRef(crypto.randomUUID())
 
   // Re-seed with whatever's currently selected each time the sheet opens, so
-  // reopening shows the active pick instead of always starting blank.
+  // reopening shows the active pick instead of always starting blank. Seeds
+  // debouncedQuery too so a reopen with a cached query shows results
+  // immediately instead of waiting out another debounce cycle.
   useEffect(() => {
     if (!open) return
-    setQuery(usingHere ? '' : currentLabel)
+    const seeded = usingHere ? '' : currentLabel
+    setQuery(seeded)
+    setDebouncedQuery(seeded)
     setError(null)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
-  // Depends on `open` too (not just `query`) — reopening with the exact same
-  // query text as before wouldn't otherwise re-trigger this, since React
-  // bails out when a state update doesn't change the value, leaving the
-  // suggestions from the previous seed effect cleared with nothing to
-  // repopulate them.
   useEffect(() => {
-    if (!open || !query.trim()) {
-      setSuggestions([])
-      setSearching(false)
-      return
-    }
-    setSearching(true)
-    const timeoutId = window.setTimeout(async () => {
-      try {
-        const results = await autocompleteCities(query, sessionToken.current)
-        setSuggestions(results)
-      } catch (err) {
-        console.error(err)
-      } finally {
-        setSearching(false)
-      }
-    }, 300) // debounce keystrokes
-
+    const timeoutId = window.setTimeout(() => setDebouncedQuery(query), 300)
     return () => window.clearTimeout(timeoutId)
-  }, [query, open])
+  }, [query])
+
+  const normalizedQuery = debouncedQuery.trim()
+  const { data: suggestions = [], isFetching: searching } = useCityAutocomplete(
+    normalizedQuery,
+    () => sessionToken.current,
+    open
+  )
 
   async function handleSelect(suggestion: PlaceSuggestion) {
     setError(null)
     try {
-      const location = await getPlaceLocation(
-        suggestion.placeId,
-        sessionToken.current
+      const location = await queryClient.fetchQuery(
+        placeLocationQueryOptions(suggestion.placeId, sessionToken.current)
       )
       onSelect(location, suggestion.mainText)
     } catch {
@@ -210,9 +200,9 @@ export function LocationSheet({
               </button>
             )
           })}
-          {!searching && query.trim() && suggestions.length === 0 && (
+          {!searching && normalizedQuery.length >= 2 && suggestions.length === 0 && (
             <p className="py-6 text-center text-sm text-muted-foreground">
-              No places match "{query}"
+              No places match "{normalizedQuery}"
             </p>
           )}
         </div>
