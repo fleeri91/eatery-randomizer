@@ -1,4 +1,5 @@
 import { Badge } from '@/components/ui/badge'
+import { PlaceMap } from '@/components/place-map'
 import { directionsLink, distanceLabel, PRICE_SYMBOLS } from '@/lib/place-links'
 import {
   CATEGORY_LABELS,
@@ -61,36 +62,29 @@ export function DesktopResultCard({
         )}
 
         <div
-          className="mt-7 flex border-t border-b border-border"
+          className="mt-4 flex flex-wrap items-center gap-x-3.5 gap-y-2 text-[15px] tracking-wide text-muted-foreground"
           style={{
             animation:
               'reveal-rise 500ms 180ms cubic-bezier(0.16, 0.84, 0.28, 1) both',
           }}
         >
-          <div className="flex-1 border-r border-border py-4">
-            <div className="text-[9px] font-semibold tracking-[0.2em] text-muted-foreground uppercase">
-              Rating
-            </div>
-            <div className="mt-2 font-heading text-[28px] leading-none font-bold text-foreground">
-              {place.rating !== null ? place.rating.toFixed(1) : '—'}
-            </div>
-          </div>
-          <div className="flex-1 border-r border-border py-4 pl-6">
-            <div className="text-[9px] font-semibold tracking-[0.2em] text-muted-foreground uppercase">
-              Away
-            </div>
-            <div className="mt-2 font-heading text-[28px] leading-none font-bold text-foreground">
-              {distanceLabel(origin, place.location) ?? '—'}
-            </div>
-          </div>
-          <div className="flex-1 py-4 pl-6">
-            <div className="text-[9px] font-semibold tracking-[0.2em] text-muted-foreground uppercase">
-              Price
-            </div>
-            <div className="mt-2 font-heading text-[28px] leading-none font-bold text-foreground">
-              {price || '—'}
-            </div>
-          </div>
+          <span className="font-bold text-foreground">
+            {place.rating !== null ? place.rating.toFixed(1) : '—'}
+          </span>
+          <span className="text-border">/</span>
+          <span>{distanceLabel(origin, place.location) ?? '—'} away</span>
+          <span className="text-border">/</span>
+          <span>{price || '—'}</span>
+        </div>
+
+        <div
+          className="relative mt-6 h-[268px] overflow-hidden border border-border"
+          style={{
+            animation:
+              'reveal-rise 500ms 260ms cubic-bezier(0.16, 0.84, 0.28, 1) both',
+          }}
+        >
+          <PlaceMap place={place} />
         </div>
 
         {passedOn.length > 0 && (

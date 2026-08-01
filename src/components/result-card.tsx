@@ -1,7 +1,7 @@
 import { createPortal } from 'react-dom'
-import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api'
 import { ChevronLeft } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
+import { PlaceMap } from '@/components/place-map'
 import {
   directionsLink,
   distanceLabel,
@@ -23,187 +23,6 @@ interface ResultCardProps {
   onReroll: () => void
   onBlock: (id: string) => void
   onBack: () => void
-}
-
-const MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string
-
-// Dark, desaturated theme matching the app's palette so the embedded map
-// reads as part of the UI instead of a bright rectangle cut into it.
-const CLEAN_MAP_STYLES: google.maps.MapTypeStyle[] = [
-  { elementType: 'geometry', stylers: [{ color: '#141110' }] },
-  { elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
-  { elementType: 'labels.text.fill', stylers: [{ color: '#9C8F7F' }] },
-  { elementType: 'labels.text.stroke', stylers: [{ color: '#141110' }] },
-
-  {
-    featureType: 'administrative',
-    elementType: 'geometry',
-    stylers: [{ color: '#37302A' }],
-  },
-  {
-    featureType: 'administrative.country',
-    elementType: 'labels.text.fill',
-    stylers: [{ color: '#C3B7A6' }],
-  },
-  { featureType: 'administrative.land_parcel', stylers: [{ visibility: 'off' }] },
-  {
-    featureType: 'administrative.locality',
-    elementType: 'labels.text.fill',
-    stylers: [{ color: '#C3B7A6' }],
-  },
-  {
-    featureType: 'administrative.neighborhood',
-    elementType: 'labels.text.fill',
-    stylers: [{ color: '#8A7C6B' }],
-  },
-
-  {
-    featureType: 'landscape.man_made',
-    elementType: 'geometry',
-    stylers: [{ color: '#211C1A' }],
-  },
-  {
-    featureType: 'landscape.natural',
-    elementType: 'geometry',
-    stylers: [{ color: '#1D1918' }],
-  },
-
-  { featureType: 'poi', elementType: 'geometry', stylers: [{ color: '#1F1A17' }] },
-  {
-    featureType: 'poi',
-    elementType: 'labels.text.fill',
-    stylers: [{ color: '#6E6154' }],
-  },
-  { featureType: 'poi.business', stylers: [{ visibility: 'off' }] },
-  {
-    featureType: 'poi.park',
-    elementType: 'geometry',
-    stylers: [{ color: '#1B211A' }],
-  },
-  {
-    featureType: 'poi.park',
-    elementType: 'labels.text.fill',
-    stylers: [{ color: '#6E7A5F' }],
-  },
-
-  {
-    featureType: 'road',
-    elementType: 'geometry.fill',
-    stylers: [{ color: '#3A322B' }],
-  },
-  {
-    featureType: 'road',
-    elementType: 'geometry.stroke',
-    stylers: [{ color: '#191514' }],
-  },
-  {
-    featureType: 'road',
-    elementType: 'labels.text.fill',
-    stylers: [{ color: '#B3A594' }],
-  },
-  {
-    featureType: 'road.arterial',
-    elementType: 'geometry.fill',
-    stylers: [{ color: '#463C33' }],
-  },
-  {
-    featureType: 'road.highway',
-    elementType: 'geometry.fill',
-    stylers: [{ color: '#5A4C40' }],
-  },
-  {
-    featureType: 'road.highway',
-    elementType: 'geometry.stroke',
-    stylers: [{ color: '#1C1817' }],
-  },
-  {
-    featureType: 'road.highway',
-    elementType: 'labels.text.fill',
-    stylers: [{ color: '#C3B7A6' }],
-  },
-  {
-    featureType: 'road.highway.controlled_access',
-    elementType: 'geometry.fill',
-    stylers: [{ color: '#6B5A4B' }],
-  },
-  {
-    featureType: 'road.local',
-    elementType: 'geometry.fill',
-    stylers: [{ color: '#312A25' }],
-  },
-  {
-    featureType: 'road.local',
-    elementType: 'labels.text.fill',
-    stylers: [{ color: '#8F8271' }],
-  },
-
-  {
-    featureType: 'transit',
-    elementType: 'labels.text.fill',
-    stylers: [{ color: '#6E6154' }],
-  },
-  {
-    featureType: 'transit.line',
-    elementType: 'geometry',
-    stylers: [{ color: '#3A322B' }],
-  },
-  {
-    featureType: 'transit.station',
-    elementType: 'geometry',
-    stylers: [{ color: '#241F1B' }],
-  },
-  {
-    featureType: 'transit.station',
-    elementType: 'labels.text.fill',
-    stylers: [{ color: '#8A7C6B' }],
-  },
-
-  { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#0C0A09' }] },
-  {
-    featureType: 'water',
-    elementType: 'labels.text.fill',
-    stylers: [{ color: '#4A4038' }],
-  },
-  {
-    featureType: 'water',
-    elementType: 'labels.text.stroke',
-    stylers: [{ color: '#0C0A09' }],
-  },
-]
-
-const staticMapOptions: google.maps.MapOptions = {
-  // Disable map manipulations
-  gestureHandling: 'none', // Disables pan, zoom, pinch, and scroll
-  zoomControl: false, // Removes zoom +/- buttons
-  mapTypeControl: false, // Removes Map/Satellite toggle
-  scaleControl: false, // Removes scale bar
-  streetViewControl: false, // Removes Pegman street view icon
-  rotateControl: false, // Removes rotation control
-  fullscreenControl: false, // Removes fullscreen button
-  keyboardShortcuts: false, // Disables keyboard arrows/navigation
-  clickableIcons: false, // Prevents clicking POIs (restaurants, parks, etc.)
-  disableDefaultUI: true, // Safety catch to turn off all standard UI controls
-  styles: CLEAN_MAP_STYLES,
-}
-
-function PlaceMap({ place }: { place: Place }) {
-  const { isLoaded } = useJsApiLoader({
-    id: 'google-map-script',
-    googleMapsApiKey: MAPS_API_KEY,
-  })
-
-  if (!isLoaded) return null
-
-  return (
-    <GoogleMap
-      mapContainerClassName="size-full"
-      center={place.location}
-      zoom={15}
-      options={staticMapOptions}
-    >
-      <Marker position={place.location} />
-    </GoogleMap>
-  )
 }
 
 export function ResultCard({
@@ -237,16 +56,9 @@ export function ResultCard({
         >
           {/* pointer-events-none lets mouse clicks pass directly to the anchor wrapper */}
           <div className="size-full pointer-events-none">
-            <PlaceMap place={place} />
+            <PlaceMap place={place} showLink={false} />
           </div>
         </a>
-
-        <div
-          className="absolute bottom-0 left-0 bg-primary px-3 py-1.5 text-[10px] font-semibold tracking-[0.2em] text-primary-foreground uppercase"
-          style={{ animation: 'fade-in 300ms ease-out' }}
-        >
-          Tonight, it's
-        </div>
 
         {/* Floating back button sitting on top of the link */}
         <button
@@ -260,8 +72,19 @@ export function ResultCard({
       </div>
 
       <div className="flex-1 overflow-y-auto px-6 py-5">
+        <div
+          className="flex items-center justify-between gap-3"
+          style={{ animation: 'fade-in 300ms ease-out' }}
+        >
+          <p className="text-[10px] font-semibold tracking-[0.2em] text-primary uppercase">
+            Tonight, it's
+          </p>
+          <p className="text-[10px] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
+            {CATEGORY_LABELS[category]}
+          </p>
+        </div>
         <h2
-          className="font-heading text-[38px] leading-[1.0] font-bold tracking-tight text-foreground"
+          className="mt-2.5 font-heading text-[38px] leading-[1.0] font-bold tracking-tight text-foreground"
           style={{
             animation:
               'reveal-rise 550ms 60ms cubic-bezier(0.16, 0.84, 0.28, 1) both',
@@ -269,9 +92,7 @@ export function ResultCard({
         >
           {place.name}
         </h2>
-        <p className="mt-2.5 text-sm text-muted-foreground">
-          {CATEGORY_LABELS[category]} · {place.address}
-        </p>
+        <p className="mt-2.5 text-sm text-muted-foreground">{place.address}</p>
 
         {place.rating === null && (
           <Badge variant="secondary" className="mt-3 h-auto px-3 py-1.5 text-xs font-medium">
@@ -280,36 +101,19 @@ export function ResultCard({
         )}
 
         <div
-          className="mt-5 flex border border-border"
+          className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm tracking-wide text-muted-foreground"
           style={{
             animation:
               'reveal-rise 500ms 180ms cubic-bezier(0.16, 0.84, 0.28, 1) both',
           }}
         >
-          <div className="flex-1 border-r border-border p-3">
-            <div className="text-[9px] font-semibold tracking-[0.2em] text-muted-foreground uppercase">
-              Rating
-            </div>
-            <div className="mt-1 font-heading text-2xl font-bold text-foreground">
-              {place.rating !== null ? place.rating.toFixed(1) : '—'}
-            </div>
-          </div>
-          <div className="flex-1 border-r border-border p-3">
-            <div className="text-[9px] font-semibold tracking-[0.2em] text-muted-foreground uppercase">
-              Away
-            </div>
-            <div className="mt-1 font-heading text-2xl font-bold text-foreground">
-              {distanceLabel(origin, place.location) ?? '—'}
-            </div>
-          </div>
-          <div className="flex-1 p-3">
-            <div className="text-[9px] font-semibold tracking-[0.2em] text-muted-foreground uppercase">
-              Price
-            </div>
-            <div className="mt-1 font-heading text-2xl font-bold text-foreground">
-              {price || '—'}
-            </div>
-          </div>
+          <span className="font-bold text-foreground">
+            {place.rating !== null ? place.rating.toFixed(1) : '—'}
+          </span>
+          <span className="text-border">/</span>
+          <span>{distanceLabel(origin, place.location) ?? '—'} away</span>
+          <span className="text-border">/</span>
+          <span>{price || '—'}</span>
         </div>
 
         {place.userRatingCount !== null && place.rating !== null && (
