@@ -1,5 +1,16 @@
 import { useState } from 'react'
-import { createPortal } from 'react-dom'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+} from '@/components/ui/drawer'
 import { Input } from '@/components/ui/input'
 import { chipClassSm } from '@/lib/chip-styles'
 import { useMediaQuery } from '@/hooks/use-media-query'
@@ -28,8 +39,6 @@ export function CuisinePicker({
   const clearSubtypes = useFilterStore((s) => s.clearSubtypes)
   const [query, setQuery] = useState('')
 
-  if (!open) return null
-
   const options = CATEGORY_SUBTYPES[category].filter((t) =>
     subtypeLabel(t).includes(query.trim().toLowerCase())
   )
@@ -37,31 +46,13 @@ export function CuisinePicker({
     ? `${subtypes.size} selected`
     : `Any ${CATEGORY_LABELS[category].toLowerCase()}`
 
-  function close() {
-    setQuery('')
-    onOpenChange(false)
+  function handleOpenChange(next: boolean) {
+    if (!next) setQuery('')
+    onOpenChange(next)
   }
 
-  const content = (
+  const searchAndChips = (
     <>
-      <div className="flex items-center justify-between gap-4 px-6 py-4">
-        <div>
-          <p className="text-[9px] font-semibold tracking-[0.24em] text-muted-foreground uppercase">
-            Cuisine
-          </p>
-          <p className="mt-1 font-heading text-xl font-bold tracking-tight text-foreground">
-            {countLabel}
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={close}
-          className="shrink-0 text-[11px] font-semibold tracking-[0.16em] text-muted-foreground uppercase hover:text-foreground"
-        >
-          Close
-        </button>
-      </div>
-
       <div className="flex items-center gap-3 border-y border-border px-6 py-3.5">
         <Input
           autoFocus
@@ -102,7 +93,7 @@ export function CuisinePicker({
 
       <button
         type="button"
-        onClick={close}
+        onClick={() => handleOpenChange(false)}
         className="shrink-0 bg-primary py-4 text-center font-heading text-sm font-bold tracking-[0.16em] text-primary-foreground uppercase"
       >
         Apply
@@ -111,41 +102,57 @@ export function CuisinePicker({
   )
 
   if (isDesktop) {
-    return createPortal(
-      <>
-        <div
-          aria-hidden
-          onClick={close}
-          className="fixed inset-0 z-40 bg-foreground/40"
-        />
-        <div
-          className="fixed top-1/2 left-1/2 z-50 flex max-h-[80vh] w-[560px] max-w-[calc(100%-64px)] flex-col border border-primary bg-card"
-          style={{
-            transform: 'translate(-50%, -50%)',
-            animation: 'modal-in 220ms cubic-bezier(0.16, 0.84, 0.28, 1)',
-          }}
+    return (
+      <Dialog open={open} onOpenChange={handleOpenChange}>
+        <DialogContent
+          showCloseButton={false}
+          className="flex max-h-[80vh] w-[560px] max-w-[calc(100%-64px)] flex-col gap-0 rounded-none border-primary bg-card p-0 ring-0 sm:max-w-[560px]"
         >
-          {content}
-        </div>
-      </>,
-      document.body
+          <DialogHeader className="flex-row items-center justify-between gap-4 px-6 py-4">
+            <div>
+              <p className="text-[9px] font-semibold tracking-[0.24em] text-muted-foreground uppercase">
+                Cuisine
+              </p>
+              <DialogTitle className="mt-1 font-heading text-xl font-bold tracking-tight text-foreground">
+                {countLabel}
+              </DialogTitle>
+            </div>
+            <button
+              type="button"
+              onClick={() => handleOpenChange(false)}
+              className="shrink-0 text-[11px] font-semibold tracking-[0.16em] text-muted-foreground uppercase hover:text-foreground"
+            >
+              Close
+            </button>
+          </DialogHeader>
+          {searchAndChips}
+        </DialogContent>
+      </Dialog>
     )
   }
 
-  return createPortal(
-    <>
-      <div
-        aria-hidden
-        onClick={close}
-        className="fixed inset-0 z-40 bg-foreground/40"
-      />
-      <div
-        className="fixed inset-x-0 bottom-0 z-50 mx-auto flex max-h-[78%] w-full max-w-sm flex-col border-t border-primary bg-card"
-        style={{ animation: 'sheet-in 280ms cubic-bezier(0.16, 0.84, 0.28, 1)' }}
-      >
-        {content}
-      </div>
-    </>,
-    document.body
+  return (
+    <Drawer open={open} onOpenChange={handleOpenChange}>
+      <DrawerContent className="max-h-[80dvh] gap-0 rounded-none border-primary bg-card">
+        <DrawerHeader className="flex-row items-center justify-between gap-4 px-6 py-4">
+          <div>
+            <p className="text-[9px] font-semibold tracking-[0.24em] text-muted-foreground uppercase">
+              Cuisine
+            </p>
+            <DrawerTitle className="mt-1 font-heading text-xl font-bold tracking-tight text-foreground">
+              {countLabel}
+            </DrawerTitle>
+          </div>
+          <button
+            type="button"
+            onClick={() => handleOpenChange(false)}
+            className="shrink-0 text-[11px] font-semibold tracking-[0.16em] text-muted-foreground uppercase hover:text-foreground"
+          >
+            Close
+          </button>
+        </DrawerHeader>
+        {searchAndChips}
+      </DrawerContent>
+    </Drawer>
   )
 }
