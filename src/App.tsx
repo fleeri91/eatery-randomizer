@@ -23,11 +23,15 @@ export default function App() {
   const clearPriceLevels = useFilterStore((s) => s.clearPriceLevels)
   const resetFilters = useFilterStore((s) => s.reset)
 
+  // Fetches as soon as a location is picked (not gated on `submitted`) so
+  // the data is usually already cached by the time "Pick for me" is
+  // clicked — filters are set on this same screen, so there's no reason to
+  // wait for the submit tap to start the network round trip.
   const {
     data: places,
     isLoading: searching,
     error: placesError,
-  } = useNearbyPlaces(submitted ? (location ?? undefined) : undefined)
+  } = useNearbyPlaces(location ?? undefined)
 
   const {
     current,
