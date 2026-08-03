@@ -136,6 +136,43 @@ export async function autocompleteCities(
     }))
 }
 
+/**
+ * Reverse geocodes coordinates into a short human-readable label (e.g.
+ * "Chelsea, New York"). Used to show what location the browser actually
+ * resolved from "Use my location" — desktop/laptop geolocation is IP/Wi-Fi
+ * based (no GPS chip), so a VPN or unusual network can report a location
+ * far from where you really are. There's no way to correct that at the API
+ * level; showing the real resolved place at least makes a wrong fix
+ * obvious instead of hiding behind a generic "Near me" label.
+ */
+export async function reverseGeocode(
+  coords: Coordinates
+): Promise<string | null> {
+  const url = new URL('https://maps.googleapis.com/maps/api/geocode/json')
+  url.searchParams.set('latlng', `${coords.lat},${coords.lng}`)
+  url.searchParams.set('key', API_KEY)
+
+  const res = await fetch(url.toString())
+  if (!res.ok) return null
+
+  const data = await res.json()
+  const components = data.results?.[0]?.address_components as
+    | { long_name: string; types: string[] }[]
+    | undefined
+  if (!components) return null
+
+  const find = (type: string) =>
+    components.find((c) => c.types.includes(type))?.long_name
+
+  const neighborhood = find('neighborhood') ?? find('sublocality')
+  const locality = find('locality') ?? find('postal_town')
+  const region = find('administrative_area_level_1')
+
+  if (neighborhood && locality) return `${neighborhood}, ${locality}`
+  if (locality && region) return `${locality}, ${region}`
+  return locality ?? data.results?.[0]?.formatted_address ?? null
+}
+
 export async function getPlaceLocation(
   placeId: string,
   sessionToken: string

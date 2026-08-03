@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { LoaderCircle, Search } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { placeLocationQueryOptions, useCityAutocomplete } from '@/lib/queries'
+import { reverseGeocode } from '@/lib/api'
 import { getCurrentPosition, isPermissionDenied } from '@/lib/geo-location'
 import { type Coordinates, type PlaceSuggestion } from '@/types/google-places'
 
@@ -52,7 +53,12 @@ export function LocationStep({ onSelect, onDenied }: LocationStepProps) {
     setLocating(true)
     setError(null)
     getCurrentPosition()
-      .then((coords) => onSelect(coords, 'Near me'))
+      .then(async (coords) => {
+        // Best-effort — if reverse geocoding fails, the coordinates are
+        // still perfectly usable, just labeled generically.
+        const label = (await reverseGeocode(coords).catch(() => null)) ?? 'Near me'
+        onSelect(coords, label)
+      })
       .catch((err: unknown) => {
         if (isPermissionDenied(err)) {
           onDenied()
