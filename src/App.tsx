@@ -33,9 +33,12 @@ export default function App() {
     current,
     randomize,
     block,
+    forgiveAll,
     poolSize,
     eligible,
     categoryPoolSize,
+    blockedPlaces,
+    allRejected,
   } = useRandomizer(
     places,
     filters.category,
@@ -58,8 +61,11 @@ export default function App() {
         current={current}
         eligible={eligible}
         poolSize={poolSize}
+        blockedPlaces={blockedPlaces}
+        allRejected={allRejected}
         onReroll={randomize}
         onBlock={block}
+        onForgiveAll={forgiveAll}
         category={filters.category}
         locationLabel={locationLabel}
         maxRadiusMeters={MAX_RADIUS_METERS}
@@ -110,7 +116,7 @@ export default function App() {
             </button>
             <div className="min-w-0">
               <p className="font-heading text-base leading-tight font-bold text-primary">
-                WHIM
+                FORKETTE
               </p>
               <p className="truncate text-[11px] tracking-wide text-muted-foreground uppercase">
                 {CATEGORY_LABELS[filters.category]} · within{' '}
@@ -133,6 +139,7 @@ export default function App() {
                     : null
                 }
                 priceActive={filters.priceLevels.size > 0}
+                allRejected={allRejected}
                 onWidenDistance={() => setRadiusMeters(MAX_RADIUS_METERS)}
                 onDropRating={() => setMinRating(0)}
                 onClearPrice={clearPriceLevels}
@@ -141,6 +148,7 @@ export default function App() {
                   resetFilters()
                   setSubmitted(false)
                 }}
+                onForgiveAll={forgiveAll}
               />
             ) : (
               <div className="flex flex-1 flex-col justify-center px-4 py-4 sm:contents">
@@ -158,6 +166,7 @@ export default function App() {
                       place={current}
                       category={filters.category}
                       origin={location}
+                      passedOn={blockedPlaces}
                       onReroll={randomize}
                       onBlock={block}
                       onBack={() => setSubmitted(false)}

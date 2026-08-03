@@ -37,11 +37,25 @@ export function useRandomizer(
     return filterByDistance(bySubtype, origin, radiusMeters)
   }, [places, category, subtypes, radiusMeters, origin])
 
-  const eligible = useMemo(() => {
+  const filtered = useMemo(() => {
     const rated = filterByRating(categoryPool, minRating)
-    const priced = filterByPrice(rated, priceLevels)
-    return priced.filter((p) => !blockedIds.has(p.id))
-  }, [categoryPool, minRating, priceLevels, blockedIds])
+    return filterByPrice(rated, priceLevels)
+  }, [categoryPool, minRating, priceLevels])
+
+  const eligible = useMemo(
+    () => filtered.filter((p) => !blockedIds.has(p.id)),
+    [filtered, blockedIds]
+  )
+
+  const blockedPlaces = useMemo(
+    () => filtered.filter((p) => blockedIds.has(p.id)),
+    [filtered, blockedIds]
+  )
+
+  // Distinguishes "you rejected every remaining option" (there was a real
+  // pool, now emptied by blocking) from "nothing ever matched your filters"
+  // — the two need different empty-state messaging.
+  const allRejected = filtered.length > 0 && eligible.length === 0
 
   useEffect(() => {
     setSeenIds(new Set())
@@ -84,13 +98,18 @@ export function useRandomizer(
     setBlockedIds((prev) => new Set(prev).add(id))
   }, [])
 
+  const forgiveAll = useCallback(() => setBlockedIds(new Set()), [])
+
   return {
     current,
     randomize,
     block,
+    forgiveAll,
     poolSize: eligible.length,
     eligible,
     categoryPoolSize: categoryPool.length,
+    blockedPlaces,
+    allRejected,
     exhausted: eligible.length > 0 && seenIds.size >= eligible.length,
     drawCount,
   }
