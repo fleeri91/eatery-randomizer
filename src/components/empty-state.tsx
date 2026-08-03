@@ -22,7 +22,6 @@ const CATEGORY_LABELS_PLURAL: Record<Category, string> = {
   cafe: 'cafés',
   restaurant: 'restaurants',
   bar: 'bars',
-  bakery: 'bakeries',
 }
 
 function SuggestionButton({

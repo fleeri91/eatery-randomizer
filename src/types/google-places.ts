@@ -19,7 +19,6 @@ export const CATEGORY_TYPES = {
   cafe: 'cafe',
   restaurant: 'restaurant',
   bar: 'bar',
-  bakery: 'bakery',
 } as const
 
 export type Category = keyof typeof CATEGORY_TYPES
@@ -28,7 +27,6 @@ export const CATEGORY_LABELS: Record<Category, string> = {
   cafe: 'Café',
   restaurant: 'Restaurant',
   bar: 'Bar',
-  bakery: 'Bakery',
 }
 
 // Real Google Places API (New) type enums, one specific subtype per chip.
@@ -44,9 +42,6 @@ export const CATEGORY_SUBTYPES: Record<Category, readonly string[]> = {
   ],
   bar: [
     'bar_and_grill', 'beer_garden', 'brewery', 'brewpub', 'cocktail_bar', 'gastropub', 'hookah_bar', 'irish_pub', 'lounge_bar', 'pub', 'sports_bar', 'wine_bar', 'winery',
-  ],
-  bakery: [
-    'bagel_shop', 'cake_shop', 'candy_store', 'chocolate_factory', 'chocolate_shop', 'confectionery', 'dessert_shop', 'donut_shop', 'ice_cream_shop', 'pastry_shop',
   ],
 }
 

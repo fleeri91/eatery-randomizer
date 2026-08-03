@@ -78,13 +78,12 @@ async function searchNearbyByType(
 }
 
 /**
- * Fetches every café/restaurant/bar/bakery Google knows about near a point,
- * once — one Nearby Search per top-level category, since Google caps each
- * call at 20 results with no pagination (a single combined request would
- * only ever return 20 places total across all four categories). Category,
- * cuisine, price, rating, and distance are all filtered client-side from
- * here on (see lib/randomizer.ts), so changing any of those never re-hits
- * the API.
+ * Fetches every café/restaurant/bar Google knows about near a point, once —
+ * one Nearby Search per category, in parallel, since Google caps each call
+ * at 20 results with no pagination (a single combined request would only
+ * ever return 20 places total across all categories). Category, cuisine,
+ * price, rating, and distance are all filtered client-side from here on
+ * (see lib/randomizer.ts), so changing any of those never re-hits the API.
  */
 export async function searchAllNearbyPlaces(
   location: Coordinates,
@@ -157,8 +156,7 @@ export async function reverseGeocode(
 
   const data = await res.json()
   const components = data.results?.[0]?.address_components as
-    | { long_name: string; types: string[] }[]
-    | undefined
+    { long_name: string; types: string[] }[] | undefined
   if (!components) return null
 
   const find = (type: string) =>
