@@ -11,6 +11,8 @@ export interface Place {
   rating: number | null
   userRatingCount: number | null
   priceLevel: PriceLevel | null
+  /** Raw Google Places type strings (e.g. "restaurant", "italian_restaurant") — used to filter by category/cuisine client-side. */
+  types: string[]
 }
 
 export const CATEGORY_TYPES = {
@@ -52,13 +54,6 @@ export function subtypeLabel(type: string): string {
   return type.replace(/_restaurant$/, '').replace(/_/g, ' ')
 }
 
-export interface SearchPlacesParams {
-  location: Coordinates
-  category: Category
-  radiusMeters?: number
-  subtypes?: ReadonlySet<string>
-}
-
 export interface RawPlace {
   id: string
   displayName?: { text: string }
@@ -67,6 +62,7 @@ export interface RawPlace {
   rating?: number
   userRatingCount?: number
   priceLevel?: string
+  types?: string[]
 }
 
 export interface PlaceFilterValues {

@@ -1,7 +1,6 @@
 import {
   type Coordinates,
   type Place,
-  type SearchPlacesParams,
   type RawPlace,
   CATEGORY_TYPES,
   type PlaceSuggestion,
@@ -19,6 +18,7 @@ const FIELD_MASK = [
   'places.rating',
   'places.userRatingCount',
   'places.priceLevel',
+  'places.types',
 ].join(',')
 
 function normalizePriceLevel(raw?: string): PriceLevel | null {
@@ -27,17 +27,26 @@ function normalizePriceLevel(raw?: string): PriceLevel | null {
     : null
 }
 
-export async function searchPlaces({
-  location,
-  category,
-  radiusMeters = 3000,
-  subtypes,
-}: SearchPlacesParams): Promise<Place[]> {
-  const includedTypes =
-    subtypes && subtypes.size > 0
-      ? [...subtypes]
-      : [CATEGORY_TYPES[category]]
+function toPlace(p: RawPlace, fallbackLocation: Coordinates): Place {
+  return {
+    id: p.id,
+    name: p.displayName?.text ?? 'Unnamed place',
+    address: p.formattedAddress ?? '',
+    location: p.location
+      ? { lat: p.location.latitude, lng: p.location.longitude }
+      : fallbackLocation,
+    rating: p.rating ?? null,
+    userRatingCount: p.userRatingCount ?? null,
+    priceLevel: normalizePriceLevel(p.priceLevel),
+    types: p.types ?? [],
+  }
+}
 
+async function searchNearbyByType(
+  location: Coordinates,
+  radiusMeters: number,
+  includedTypes: string[]
+): Promise<Place[]> {
   const res = await fetch(
     'https://places.googleapis.com/v1/places:searchNearby',
     {
@@ -65,18 +74,31 @@ export async function searchPlaces({
   }
 
   const data: { places?: RawPlace[] } = await res.json()
+  return (data.places ?? []).map((p) => toPlace(p, location))
+}
 
-  return (data.places ?? []).map((p) => ({
-    id: p.id,
-    name: p.displayName?.text ?? 'Unnamed place',
-    address: p.formattedAddress ?? '',
-    location: p.location
-      ? { lat: p.location.latitude, lng: p.location.longitude }
-      : location,
-    rating: p.rating ?? null,
-    userRatingCount: p.userRatingCount ?? null,
-    priceLevel: normalizePriceLevel(p.priceLevel),
-  }))
+/**
+ * Fetches every café/restaurant/bar/bakery Google knows about near a point,
+ * once — one Nearby Search per top-level category, since Google caps each
+ * call at 20 results with no pagination (a single combined request would
+ * only ever return 20 places total across all four categories). Category,
+ * cuisine, price, rating, and distance are all filtered client-side from
+ * here on (see lib/randomizer.ts), so changing any of those never re-hits
+ * the API.
+ */
+export async function searchAllNearbyPlaces(
+  location: Coordinates,
+  radiusMeters: number
+): Promise<Place[]> {
+  const results = await Promise.all(
+    Object.values(CATEGORY_TYPES).map((type) =>
+      searchNearbyByType(location, radiusMeters, [type])
+    )
+  )
+
+  const byId = new Map<string, Place>()
+  for (const place of results.flat()) byId.set(place.id, place)
+  return [...byId.values()]
 }
 
 export async function autocompleteCities(

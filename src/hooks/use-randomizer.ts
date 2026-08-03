@@ -1,22 +1,47 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { type Place, type PriceLevel } from '@/types/google-places'
-import { filterByPrice, filterByRating, pickRandom } from '@/lib/randomizer'
+import {
+  type Category,
+  type Coordinates,
+  type Place,
+  type PriceLevel,
+} from '@/types/google-places'
+import {
+  filterByCategory,
+  filterByDistance,
+  filterByPrice,
+  filterByRating,
+  filterBySubtypes,
+  pickRandom,
+} from '@/lib/randomizer'
 
 export function useRandomizer(
   places: Place[] | undefined,
+  category: Category,
+  subtypes: ReadonlySet<string>,
+  radiusMeters: number,
   minRating: number,
-  priceLevels: ReadonlySet<PriceLevel>
+  priceLevels: ReadonlySet<PriceLevel>,
+  origin: Coordinates | null
 ) {
   const [seenIds, setSeenIds] = useState<Set<string>>(new Set())
   const [blockedIds, setBlockedIds] = useState<Set<string>>(new Set())
   const [current, setCurrent] = useState<Place | null>(null)
   const [drawCount, setDrawCount] = useState(0)
 
+  // Everything that matches category/cuisine/distance, before rating/price —
+  // lets the empty state tell "nothing here at all" apart from "your
+  // rating/price filter zeroed it out".
+  const categoryPool = useMemo(() => {
+    const byCategory = filterByCategory(places ?? [], category)
+    const bySubtype = filterBySubtypes(byCategory, subtypes)
+    return filterByDistance(bySubtype, origin, radiusMeters)
+  }, [places, category, subtypes, radiusMeters, origin])
+
   const eligible = useMemo(() => {
-    const rated = filterByRating(places ?? [], minRating)
+    const rated = filterByRating(categoryPool, minRating)
     const priced = filterByPrice(rated, priceLevels)
     return priced.filter((p) => !blockedIds.has(p.id))
-  }, [places, minRating, priceLevels, blockedIds])
+  }, [categoryPool, minRating, priceLevels, blockedIds])
 
   useEffect(() => {
     setSeenIds(new Set())
@@ -65,6 +90,7 @@ export function useRandomizer(
     block,
     poolSize: eligible.length,
     eligible,
+    categoryPoolSize: categoryPool.length,
     exhausted: eligible.length > 0 && seenIds.size >= eligible.length,
     drawCount,
   }

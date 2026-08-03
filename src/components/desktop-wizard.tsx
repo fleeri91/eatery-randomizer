@@ -19,7 +19,7 @@ interface DesktopWizardProps {
   onBackToFilters: () => void
   searching: boolean
   placesError: Error | null
-  places: Place[] | undefined
+  categoryPoolSize: number
   current: Place | null
   eligible: Place[]
   poolSize: number
@@ -116,7 +116,7 @@ export function DesktopWizard({
   onBackToFilters,
   searching,
   placesError,
-  places,
+  categoryPoolSize,
   current,
   eligible,
   poolSize,
@@ -186,7 +186,7 @@ export function DesktopWizard({
                   locationLabel={locationLabel}
                   radiusMeters={radiusMeters}
                   maxRadiusMeters={maxRadiusMeters}
-                  hasRawResults={(places?.length ?? 0) > 0}
+                  hasRawResults={categoryPoolSize > 0}
                   ratingLabel={
                     minRating > 0 ? `${minRating.toFixed(1)}+` : null
                   }

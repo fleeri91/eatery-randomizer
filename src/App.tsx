@@ -27,17 +27,23 @@ export default function App() {
     data: places,
     isLoading: searching,
     error: placesError,
-  } = useNearbyPlaces(
-    submitted ? (location ?? undefined) : undefined,
-    filters.category,
-    filters.radiusMeters,
-    filters.subtypes
-  )
+  } = useNearbyPlaces(submitted ? (location ?? undefined) : undefined)
 
-  const { current, randomize, block, poolSize, eligible } = useRandomizer(
+  const {
+    current,
+    randomize,
+    block,
+    poolSize,
+    eligible,
+    categoryPoolSize,
+  } = useRandomizer(
     places,
+    filters.category,
+    filters.subtypes,
+    filters.radiusMeters,
     filters.minRating,
-    filters.priceLevels
+    filters.priceLevels,
+    location
   )
 
   if (isDesktop) {
@@ -48,7 +54,7 @@ export default function App() {
         onBackToFilters={() => setSubmitted(false)}
         searching={submitted && searching}
         placesError={submitted ? placesError : null}
-        places={places}
+        categoryPoolSize={categoryPoolSize}
         current={current}
         eligible={eligible}
         poolSize={poolSize}
@@ -120,7 +126,7 @@ export default function App() {
                 locationLabel={locationLabel}
                 radiusMeters={filters.radiusMeters}
                 maxRadiusMeters={MAX_RADIUS_METERS}
-                hasRawResults={places.length > 0}
+                hasRawResults={categoryPoolSize > 0}
                 ratingLabel={
                   filters.minRating > 0
                     ? `${filters.minRating.toFixed(1)}+`
