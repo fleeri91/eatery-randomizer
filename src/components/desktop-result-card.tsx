@@ -1,4 +1,3 @@
-import { Badge } from '@/components/ui/badge'
 import { PlaceMap } from '@/components/place-map'
 import { directionsLink, distanceLabel, PRICE_SYMBOLS } from '@/lib/place-links'
 import {
@@ -55,12 +54,6 @@ export function DesktopResultCard({
         </h2>
         <p className="mt-3 text-sm text-muted-foreground">{place.address}</p>
 
-        {place.rating === null && (
-          <Badge variant="secondary" className="mt-3 h-auto px-3 py-1.5 text-xs font-medium">
-            Not yet rated — you're the scout
-          </Badge>
-        )}
-
         <div
           className="mt-4 flex flex-wrap items-center gap-x-3.5 gap-y-2 text-[15px] tracking-wide text-muted-foreground"
           style={{
@@ -69,7 +62,8 @@ export function DesktopResultCard({
           }}
         >
           <span className="font-bold text-foreground">
-            {place.rating !== null ? place.rating.toFixed(1) : '—'}
+            {/* Unrated places are filtered out upstream (filterByRating). */}
+            {place.rating!.toFixed(1)}
           </span>
           <span className="text-border">/</span>
           <span>{distanceLabel(origin, place.location) ?? '—'} away</span>

@@ -30,8 +30,9 @@ export function filterByDistance(
   )
 }
 
+// Also excludes unrated places outright, even when minRating is 0 ("Any") —
+// a place chance can't back up with a rating isn't a real recommendation.
 export function filterByRating(places: Place[], minRating: number): Place[] {
-  if (minRating <= 0) return places
   return places.filter((p) => p.rating !== null && p.rating >= minRating)
 }
 

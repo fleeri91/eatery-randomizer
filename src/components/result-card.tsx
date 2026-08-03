@@ -1,6 +1,5 @@
 import { createPortal } from 'react-dom'
 import { ChevronLeft } from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
 import { PlaceMap } from '@/components/place-map'
 import {
   directionsLink,
@@ -94,12 +93,6 @@ export function ResultCard({
         </h2>
         <p className="mt-2.5 text-sm text-muted-foreground">{place.address}</p>
 
-        {place.rating === null && (
-          <Badge variant="secondary" className="mt-3 h-auto px-3 py-1.5 text-xs font-medium">
-            Not yet rated — you're the scout
-          </Badge>
-        )}
-
         <div
           className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm tracking-wide text-muted-foreground"
           style={{
@@ -108,7 +101,8 @@ export function ResultCard({
           }}
         >
           <span className="font-bold text-foreground">
-            {place.rating !== null ? place.rating.toFixed(1) : '—'}
+            {/* Unrated places are filtered out upstream (filterByRating). */}
+            {place.rating!.toFixed(1)}
           </span>
           <span className="text-border">/</span>
           <span>{distanceLabel(origin, place.location) ?? '—'} away</span>
@@ -116,7 +110,7 @@ export function ResultCard({
           <span>{price || '—'}</span>
         </div>
 
-        {place.userRatingCount !== null && place.rating !== null && (
+        {place.userRatingCount !== null && (
           <p className="mt-2.5 text-xs text-muted-foreground">
             {place.userRatingCount} ratings
           </p>
